@@ -12,7 +12,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: Jonas Gonzalez
+    environment: Carmen Uzcategui
 
     steps:
       - name: Install clasp
