@@ -3,7 +3,7 @@ name: Deploy Script
 on:
   workflow_dispatch:
   push:
-    branches: [carmen-uzcategui, jonas-gonzalez]
+    branches: [main, develop]
   release:
     types: [published]
   schedule:
@@ -12,11 +12,12 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: Jonas Gonzalez
 
     steps:
       - name: Install clasp
         id: install-clasp
-        run: sudo npm install @google/clasp@2.4.* -g
+        run: sudo npm install @google/clasp@2.4.1 -g
 
       - name: Write CLASPRC_JSON secret to .clasprc.json file
         id: write-clasprc
@@ -65,8 +66,34 @@ jobs:
 
       - name: Deploy Script
         id: clasp-deploy
-        if: ${{env.DEPLOYMENT_ID && (github.event_name == 'release' || github.event_name == 'push')}}
+        if: ${{env.DEPLOYMENT_ID && (github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))}}
         run: clasp deploy -i "$DEPLOYMENT_ID" -d "$GITHUB_REF"
         env:
           DEPLOYMENT_ID: ${{ secrets.DEPLOYMENT_ID }}
-
+  # dump-context:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Dump GitHub context
+  #       env:
+  #         GITHUB_CONTEXT: ${{ toJSON(github) }}
+  #       run: echo "$GITHUB_CONTEXT"
+  #     - name: Dump job context
+  #       env:
+  #         JOB_CONTEXT: ${{ toJSON(job) }}
+  #       run: echo "$JOB_CONTEXT"
+  #     - name: Dump steps context
+  #       env:
+  #         STEPS_CONTEXT: ${{ toJSON(steps) }}
+  #       run: echo "$STEPS_CONTEXT"
+  #     - name: Dump runner context
+  #       env:
+  #         RUNNER_CONTEXT: ${{ toJSON(runner) }}
+  #       run: echo "$RUNNER_CONTEXT"
+  #     - name: Dump strategy context
+  #       env:
+  #         STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
+  #       run: echo "$STRATEGY_CONTEXT"
+  #     - name: Dump matrix context
+  #       env:
+  #         MATRIX_CONTEXT: ${{ toJSON(matrix) }}
+  #       run: echo "$MATRIX_CONTEXT"
