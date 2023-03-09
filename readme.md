@@ -2,40 +2,51 @@
 
 [![Deploy Script](https://github.com/SOM-Firmwide/deploy-google-app-script-action/actions/workflows/deploy-script.yml/badge.svg)](https://github.com/SOM-Firmwide/deploy-google-app-script-action/actions/workflows/deploy-script.yml)
 
-This repository is an example of how to setup an automatic [CI/CD](https://en.wikipedia.org/wiki/CI/CD) process for [Google Apps Script](https://developers.google.com/apps-script) using [GitHub Actions](https://docs.github.com/en/actions).
+This repository help us to setup an automatic [CI/CD](https://en.wikipedia.org/wiki/CI/CD) process for [Google Apps Script](https://developers.google.com/apps-script) using [GitHub Actions](https://docs.github.com/en/actions).
 ## Setup
 
-### Setup Project Files
+### Setup Git Branch Repository for a new person
 
-1. Install [clasp](https://developers.google.com/apps-script/guides/clasp) on your development machine if not already installed.
-2. Create a local copy of a Google Apps Script project. You may use `clasp create` to create a new project or `clasp clone` to download an existing project. This will create a `.clasp.json` file.
-3. Initialize the project folder as a new Git repo: `git init`. 
-   1. The `.clasp.json` file created in the prior step MUST be in the root of the Git repository, 
-   2. `.clasp.json` may point to source files in a sub folder throgh a `rootDir` property. 
-4. Copy `.github/workflows/deploy-script.yml` from this repository to the same relative path.
+1. Create a new branch: `git checkout main && git checkout -b <<person-name>>`
+2. Set up environment: On the deploy-script.yml file set the Environment to the persons name
+    ```
+    name: Deploy Script
 
+    on:
+    workflow_dispatch:
+    push:
+        branches: [<<first_person_name>>, <<second_person_name>>, <<NEW_person_name>>]
+    release:
+        types: [published]
+    schedule:
+        - cron: "0 0 * * SUN"
 
-#### `.clasp.json` File Format Reference
+    jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        environment: <<Capitalize Person Name>>
+    .
+    .
+    .
+    ```
+3. Include branch into batch updating file: On the ./update-all.bat
+    ```
+    ECHO "UPDATING BRANCHES"
+    git checkout main
+    git pull origin main
 
-    {
-        "scriptId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";        
-        "rootDir": "src",
-        "projectId": "project-id-0000000000000000000",
-        "fileExtension": "js",
-        "filePushOrder": ["src/File1.js", "src/File1.js", "src/File1.js"],
-        "parentId": "XXXXXXXXXXXXXXXXXXXXXX"
-    }
+    git checkout <<first_person_name>>
+    git merge main
+    git push origin <<first_person_name>>
 
+    git checkout <<second_person_name>>
+    git merge main
+    git push origin <<second_person_name>>
 
-### Setup Git Repository
-
-1. Stage files: `git add .`
-2. Commit files: `git commit -m "first commit"`
-3. Create a `develop` branch: `git branch -M develop`
-4. Create a `main` branch: `git branch -M main`
-5.  Create a new GitHub repository, and add it as a remote: `git remote add origin git@github.com:account/repo.git`
-6.  Push the `main` branch to GitHub: `git push -u origin main`
-7. Push the `develop` branch to GitHub: `git push -u origin develop`
+    git checkout <<NEW_person_name>>
+    git merge main
+    git push origin <<NEW_person_name>>
+    ```
 
 At this point the workflow will be triggered, but will fail because it is not configured completely.
 
@@ -44,7 +55,7 @@ At this point the workflow will be triggered, but will fail because it is not co
 [Github encrypted secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) are used to configure the workflow and can be set from the repository settings page on GitHub.
 #### `CLASPRC_JSON`
 
-The `clasp` command line tool uses a `.clasprc.json` file to store the current login information. The contents of this file need to be added to a `CLASPRC_JSON` secret to allow the workflow to update and deploy scripts.
+The `clasp` command line tool uses a `.clasprc.json` file to store the current login information. The contents of this file need to be added to a `CLASPRC_JSON` secret on a new github environment with the name of the person to allow the workflow to update and deploy scripts.
 
 1. Login to clasp as the user that should run the workflow: 
    1. Run `clasp login` 
@@ -52,28 +63,22 @@ The `clasp` command line tool uses a `.clasprc.json` file to store the current l
 2. Open the `.clasprc.json` file that is created in the home directory (`C:\Users\{username}` on windows, and `~/.clasprc.json` on Linux)
 3. Copy the contents of `.clasprc.json` into a new secret named `CLASPRC_JSON`
 
-#### `REPO_ACCESS_TOKEN`
-A GitHub personal access token must be provided to the workfow to allow it to update the `CLASPRC_JSON` secret configured about when tokens expire and refresh.
+#### `SCRIPT_ID`
 
-1. Create a new [GitHubpersonal access token](https://github.com/settings/tokens/new) with `repo` scope.
-2. Copy the token into a new secret named `REPO_ACCESS_TOKEN`
+The clasp command line tool identifies the Google Apps Script project to push and deploy too using the `scriptId` property in `.clasp.json`. To specify the target script add a `SCRIPT_ID` secret in the previous created environment. This will cause the workflow to override whatever literal scriptId value is in `.clasp.json`
 
-#### `SCRIPT_ID` [OPTIONAL]
+#### `DEPLOYMENT_ID`
 
-The clasp command line tool identifies the Google Apps Script project to push and deploy too using the `scriptId` property in `.clasp.json`. You may leave this value hard coded in `.clasp.json` or you may have this set dynamically. To specify the target script dynamically add a `SCRIPT_ID` secret to the repository. This will cause the workflow to override whatever literal scriptId value is in `.clasp.json`
-
-#### `DEPLOYMENT_ID` [OPTIONAL]
-
-The workflow can automatically deploy the script when the `main` branch is pushed to github.
+The workflow can automatically deploy the script when the branches are pushed to github.
 
 1. Determine the ID of the deployment you want
    1. Create a new deployment by running `clasp deploy` or on https://scripts.google.com.
    2. Find the deploymen id by running `clasp deployments` or checking the projet settings on https://scripts.google.com.
-2. Add the desired deployment id to a secret naned `DEPLOYMENT_ID`
+2. Add the desired deployment id in the same environment with the name `DEPLOYMENT_ID`
+
 ## Usage
 
-- Pushing to either the `main` or `develop` branches on github will automatically trigger the workflow to push the code to the `HEAD` deployment on https://scripts.google.com`
-- If the `DEPLOYMENT_ID` secret has been setup pushing to `main` will also deploy the script to the specified deployment.
+- Pushing to the branches on github will automatically trigger the workflow to push the code to the `HEAD` deployment on https://scripts.google.com`
 
 ## Updating `.clasprc.json`
 
@@ -111,24 +116,3 @@ The "correct" way to setup a server to server connection like is through a GCP s
 
 - [Advanced Clasp Docs](https://github.com/google/clasp/tree/master/docs)
   
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
