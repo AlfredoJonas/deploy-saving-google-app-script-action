@@ -15,6 +15,18 @@ This repository help us to setup an automatic [CI/CD](https://en.wikipedia.org/w
 1. Go to the [template](https://docs.google.com/spreadsheets/d/1Pv5DCTmQ2IyI0CZjfkbG78-zs7J71TWCbUOmE-i844Q/edit#gid=385676250) sheet and copy it into your personal drive. from the url of the sheet copy the `SSID` associated with it, you can find it in the url with this format `https://docs.google.com/spreadsheets/d/<<SSID>>/edit#gid=<<other_id>>`
 2. This will generate automatically an AppScript copy of the original. From this App Script copy you will extract the `SCRIPT_ID` variable on the URL with this format `https://script.google.com/home/projects/<<script_id>>/edit`.
 
+### Save required for setting up the sequencer Command-Line Parameters
+
+1. Once in the AppScript, go to the config tap in the left sidebar
+2. scroll down on the 'sequencer Command-Line Parameters' section and start adding the following parameters:
+    * exchangeUrl: 'https://s3.amazonaws.com/dolartoday/data.json'
+    * ssId: `SSID`
+    * telegramToken: `telegramToken`
+    * telegramUrl: 'https://api.telegram.org/bot'
+    * telegramUserId1: `telegramUserId`
+    * telegramUserId2: `telegramUserId`
+    * webAppUrl: It will be generated later at the end of the step processes in the readme instructions.
+
 ### Setup Git Branch Repository for a new bot with the persons name for better understanding
 
 1. Create a new branch: `git checkout main && git checkout -b <<person-name>>`
