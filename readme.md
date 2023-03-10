@@ -18,7 +18,7 @@ This repository help us to setup an automatic [CI/CD](https://en.wikipedia.org/w
 ### Save required for setting up the sequencer Command-Line Parameters
 
 1. Once in the AppScript, go to the config tap in the left sidebar
-2. scroll down on the 'sequencer Command-Line Parameters' section and start adding the following parameters:
+2. Scroll down on the 'sequencer Command-Line Parameters' section and start adding the following parameters:
     * exchangeUrl: 'https://s3.amazonaws.com/dolartoday/data.json'
     * ssId: `SSID`
     * telegramToken: `telegramToken`
