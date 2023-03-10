@@ -1,11 +1,21 @@
-# Deploy Google App Script Action
+# Deploy Google App Scripts
 
 [![Deploy Script](https://github.com/SOM-Firmwide/deploy-google-app-script-action/actions/workflows/deploy-script.yml/badge.svg)](https://github.com/SOM-Firmwide/deploy-google-app-script-action/actions/workflows/deploy-script.yml)
 
-This repository help us to setup an automatic [CI/CD](https://en.wikipedia.org/wiki/CI/CD) process for [Google Apps Script](https://developers.google.com/apps-script) using [GitHub Actions](https://docs.github.com/en/actions).
+This repository help us to setup an automatic [CI/CD](https://en.wikipedia.org/wiki/CI/CD) process for [Google Apps Scripts](https://developers.google.com/apps-script) using [GitHub Actions](https://docs.github.com/en/actions) for multiple users, and in these terms, use it to handle telegram messages and keep records related to expenses, as well as generate reports.
 ## Setup
 
-### Setup Git Branch Repository for a new person
+### Create a new Telegram Bot using the [@BotFather](https://t.me/BotFather)
+
+1. Save the token to access the HTTP API, it will be used for configure the `telegramToken`.
+2. Go to the [@userinfobot](https://t.me/userinfobot) bot, init it and copy the id that the bot sends you, it will be used as the `telegramUserId`.
+
+### Copy Google Sheet from [template](https://docs.google.com/spreadsheets/d/1Pv5DCTmQ2IyI0CZjfkbG78-zs7J71TWCbUOmE-i844Q/edit#gid=385676250)
+
+1. Go to the [template](https://docs.google.com/spreadsheets/d/1Pv5DCTmQ2IyI0CZjfkbG78-zs7J71TWCbUOmE-i844Q/edit#gid=385676250) sheet and copy it into your personal drive. from the url of the sheet copy the `SSID` associated with it, you can find it in the url with this format `https://docs.google.com/spreadsheets/d/<<SSID>>/edit#gid=<<other_id>>`
+2. This will generate automatically an AppScript copy of the original. From this App Script copy you will extract the `SCRIPT_ID` variable on the URL with this format `https://script.google.com/home/projects/<<script_id>>/edit`.
+
+### Setup Git Branch Repository for a new bot with the persons name for better understanding
 
 1. Create a new branch: `git checkout main && git checkout -b <<person-name>>`
 2. Set up environment: On the deploy-script.yml file set the Environment to the persons name
