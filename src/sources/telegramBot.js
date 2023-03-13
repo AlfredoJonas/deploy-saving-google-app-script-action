@@ -9,7 +9,7 @@ class TelegramBot extends BaseSource {
     }
 
     sendMessage(text) {
-        const url = telegramUrl + '/sendMessage?chat_id=' + this.telegramUserId + '&text='+ text;
+        const url = PROPERTIES.getProperty('telegramUrl') + PROPERTIES.getProperty('telegramToken') + '/sendMessage?chat_id=' + this.telegramUserId + '&text='+ text;
         UrlFetchApp.fetch(url);
     }
 }
