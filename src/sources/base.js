@@ -125,7 +125,7 @@ class BaseSource {
   processReport() {
     const otrosSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('otros');
     if (this.text == '/reporte') {
-      statusReporte = otrosSheet.getRange('F3');
+      const statusReporte = otrosSheet.getRange('F3');
       this.cleanReportCells(otrosSheet);
       statusReporte.setValue('VERDADERO');
       this.sendMessage("El reporte ah iniciado...");
