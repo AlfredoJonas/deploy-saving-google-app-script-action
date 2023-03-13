@@ -15,7 +15,7 @@ function doPost(e) {
     } else if (telegramBot.checkReport()) {
       telegramBot.processReport();
     } else {
-      proccessExpenseMessage();
+      telegramBot.proccessExpenseMessage();
     }
   } else {
       sendMessage(id, "ACCESS ERROR: you can't use this service.");
