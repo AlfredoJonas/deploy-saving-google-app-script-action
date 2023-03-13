@@ -8,7 +8,7 @@ class BaseSource {
     throw new Error("authentnicate method needs to be implemented");
   }
 
-  sendMessage() {
+  sendMessage(text = null) {
     throw new Error("sendMessage method needs to be implemented");
   }
 
