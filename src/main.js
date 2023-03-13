@@ -1,9 +1,8 @@
 const PROPERTIES = PropertiesService.getScriptProperties();
-const telegramUrl = PROPERTIES.getProperty('telegramUrl') + PROPERTIES.getProperty('telegramToken');
 
 function setWebhook() {
   const webAppUrl = PROPERTIES.getProperty('webAppUrl');
-  const url = telegramUrl + '/setWebhook?url=' + webAppUrl;
+  const url = PROPERTIES.getProperty('telegramUrl') + PROPERTIES.getProperty('telegramToken') + '/setWebhook?url=' + webAppUrl;
   UrlFetchApp.fetch(url);
 }
 
@@ -11,6 +10,7 @@ function doPost(e) {
   const contents = JSON.parse(e.postData.contents);
   const telegramBot = new TelegramBot(contents.message.text, contents.message.from.id);
   if (telegramBot.authenticate()) {
+    telegramBot.sendMessage("YOU ARE IN.");
     if (text == '/finreporte') {
       telegramBot.cleanReport();
     } else if (telegramBot.checkReport()) {
