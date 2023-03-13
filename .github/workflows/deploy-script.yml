@@ -3,7 +3,7 @@ name: Deploy Script
 on:
   workflow_dispatch:
   push:
-    branches: [jonas-gonzalez, carmen-uzcategui]
+    branches: [carmen-uzcategui, jonas-gonzalez]
   release:
     types: [published]
   schedule:
@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Install clasp
         id: install-clasp
-        run: sudo npm install @google/clasp@2.4.1 -g
+        run: sudo npm install @google/clasp@2.4.* -g
 
       - name: Write CLASPRC_JSON secret to .clasprc.json file
         id: write-clasprc

@@ -8,7 +8,7 @@ This repository help us to setup an automatic [CI/CD](https://en.wikipedia.org/w
 ### Create a new Telegram Bot using the [@BotFather](https://t.me/BotFather)
 
 1. Save the token to access the HTTP API, it will be used for configure the `telegramToken`.
-2. Go to the [@userinfobot](https://t.me/userinfobot) bot, init it and copy the id that the bot sends you, it will be used as the `telegramUserId`
+2. Go to the [@userinfobot](https://t.me/userinfobot) bot, init it and copy the id that the bot sends you, it will be used as the `telegramUserId`.
 
 ### Copy Google Sheet from [template](https://docs.google.com/spreadsheets/d/1Pv5DCTmQ2IyI0CZjfkbG78-zs7J71TWCbUOmE-i844Q/edit#gid=385676250)
 
