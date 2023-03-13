@@ -8,9 +8,9 @@ function setWebhook() {
 
 function doPost(e) {
   const contents = JSON.parse(e.postData.contents);
-  const telegramBot = new TelegramBot(contents.message.text, contents.message.from.id);
+  const text = contents.message.text;
+  const telegramBot = new TelegramBot(text, contents.message.from.id);
   if (telegramBot.authenticate()) {
-    telegramBot.sendMessage("YOU ARE IN.");
     if (text == '/finreporte') {
       telegramBot.cleanReport();
     } else if (telegramBot.checkReport()) {
