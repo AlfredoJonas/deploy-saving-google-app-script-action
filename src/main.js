@@ -1,6 +1,7 @@
+const PROPERTIES = PropertiesService.getScriptProperties();
+const telegramUrl = PROPERTIES.getProperty('telegramUrl') + properties.getProperty('telegramToken');
+
 function setWebhook() {
-  const properties = PropertiesService.getScriptProperties();
-  const telegramUrl = properties.getProperty('telegramUrl') + properties.getProperty('telegramToken');
   const webAppUrl = properties.getProperty('webAppUrl');
   const url = telegramUrl + '/setWebhook?url=' + webAppUrl;
   UrlFetchApp.fetch(url);
@@ -18,6 +19,6 @@ function doPost(e) {
       telegramBot.proccessExpenseMessage();
     }
   } else {
-      sendMessage(id, "ACCESS ERROR: you can't use this service.");
+    telegramBot.sendMessage("ACCESS ERROR: you can't use this service.");
   }
 }

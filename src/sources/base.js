@@ -1,6 +1,6 @@
 class BaseSource {
   constructor(text) {
-    this.ssId = PropertiesService.getScriptProperties().getProperty('ssId');;
+    this.ssId = PROPERTIES.getProperty('ssId');;
     this.text = text;
   }
 
@@ -18,7 +18,7 @@ class BaseSource {
   }
 
   getCurrencyInfo() {
-    const response = UrlFetchApp.fetch(PropertiesService.getScriptProperties().getProperty('exchangeUrl'));
+    const response = UrlFetchApp.fetch(PROPERTIES.getProperty('exchangeUrl'));
     return JSON.parse(response.getContentText());
   }
 
