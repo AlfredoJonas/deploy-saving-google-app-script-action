@@ -1,8 +1,8 @@
 const PROPERTIES = PropertiesService.getScriptProperties();
-const telegramUrl = PROPERTIES.getProperty('telegramUrl') + properties.getProperty('telegramToken');
+const telegramUrl = PROPERTIES.getProperty('telegramUrl') + PROPERTIES.getProperty('telegramToken');
 
 function setWebhook() {
-  const webAppUrl = properties.getProperty('webAppUrl');
+  const webAppUrl = PROPERTIES.getProperty('webAppUrl');
   const url = telegramUrl + '/setWebhook?url=' + webAppUrl;
   UrlFetchApp.fetch(url);
 }
