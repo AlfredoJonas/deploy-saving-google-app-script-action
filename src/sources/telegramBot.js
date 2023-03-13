@@ -8,8 +8,8 @@ class TelegramBot extends BaseSource {
         return PROPERTIES.getProperty('telegramUserIds').split(',').includes(this.telegramUserId);
     }
 
-    sendMessage(text = null) {
-        const url = telegramUrl + '/sendMessage?chat_id=' + this.telegramUserId + '&text='+ text || this.text;
+    sendMessage(text) {
+        const url = telegramUrl + '/sendMessage?chat_id=' + this.telegramUserId + '&text='+ text;
         UrlFetchApp.fetch(url);
     }
 }
