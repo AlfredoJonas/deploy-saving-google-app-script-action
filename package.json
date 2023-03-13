@@ -9,8 +9,5 @@
 	},
 	"devDependencies": {
 		"jest": "^29.5.*"
-	},
-	"dependencies": {
-		"import-fixer": "^0.8.2204282156"
 	}
 }
