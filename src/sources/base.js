@@ -59,11 +59,11 @@ class BaseSource {
       const message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
       response['success'] = true;
       response['message'] = message;
-      sendMessage(message);
+      this.sendMessage(message);
     } else {
       const message = "ERROR: Verifique el formato del mensaje.";
       response['message'] = message;
-      sendMessage(message);
+      this.sendMessage(message);
     }
     return response;
   }
@@ -128,16 +128,16 @@ class BaseSource {
       statusReporte = otrosSheet.getRange('F3');
       this.cleanReportCells(otrosSheet);
       statusReporte.setValue('VERDADERO');
-      sendMessage("El reporte ah iniciado...");
+      this.sendMessage("El reporte ah iniciado...");
     } else {
       this.fillReportCell(otrosSheet);
     }
     const currentCell = this.findEmptyReportCell(otrosSheet);
     if (currentCell) {
-      sendMessage("Ingrese " + currentCell.getValues()[0][0] + ":");
+      this.sendMessage("Ingrese " + currentCell.getValues()[0][0] + ":");
     } else {
       const finalReportMessage = this.buildfinalReportMessage(otrosSheet)
-      sendMessage(finalReportMessage);
+      this.sendMessage(finalReportMessage);
       this.cleanReportCells(otrosSheet);
     }
   }
@@ -154,7 +154,7 @@ class BaseSource {
     const statusReporte = otrosSheet.getRange('F3');
     if (statusReporte.getValue() == 'VERDADERO') {
       this.cleanReportCells(otrosSheet);
-      sendMessage("El reporte ah finalizado brother!");
+      this.sendMessage("El reporte ah finalizado brother!");
     }
   }
 }
