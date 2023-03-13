@@ -1,33 +1,62 @@
 class BaseSource {
+  /**
+     * Allow to process text from different sources, saving expenses 
+     * records on a Google Sheet based on the recived text format
+     *
+  */
+
+  /**
+   * constructor description
+   * @param  {[string]} text [formated text from the source]
+   */
   constructor(text) {
-    this.ssId = PROPERTIES.getProperty('ssId');;
+    this.ssId = PROPERTIES.getProperty('ssId');
+    //class members. Should be private. 
+    /** @private */
     this.text = text;
+    /** @private */
+    this.otrosSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('otros');
   }
 
+  /**
+   * Defined on the child class, this validates 
+   * whatever it's needed to process the text
+   */
   authenticate() {
     throw new Error("authenticate method needs to be implemented");
   }
 
+  /**
+   * Defined on the child class, this process a 
+   * text to send a message back to the source
+   * @param  {[string]} text [text to be send back to the source]
+   */
   sendMessage(text) {
     throw new Error("sendMessage method needs to be implemented");
   }
 
+  /**
+   * Check if any current or incoming report
+   */
   checkReport() {
-    const otrosSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('otros');
-    return (this.text == '/reporte' || otrosSheet.getRange('F3').getValue() == 'VERDADERO');
+    return (this.text == '/reporte' || this.otrosSheet.getRange('F3').getValue() == 'VERDADERO');
   }
 
+  /**
+   * Get currency information related to Bs/COP/Dolar 
+   * from an S3 bucket where uptodate information it's 
+   * being stored from the dolartoday.com web page
+   */
   getCurrencyInfo() {
     const response = UrlFetchApp.fetch(PROPERTIES.getProperty('exchangeUrl'));
     return JSON.parse(response.getContentText());
   }
 
+  /**
+   * Check the text send from the source and proccess it 
+   * to save a new expense record on the Google Sheet
+   */
   proccessExpenseMessage() {
-    const response = {
-      success: false,
-      message: null
-    };
-    
     const expenseSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('Gastos diarios');
     const nowDate = new Date();
     const date = formatDate(nowDate);
@@ -41,6 +70,7 @@ class BaseSource {
     var dolar = null;
     var bolivar = null;
 
+    // Calculate all the currences to keep a history record
     if (item[1] == 'Bolivar') {
       pesos = parseFloat(monto * bsPesos);
       dolar = parseFloat(monto / bsUsd);
@@ -54,26 +84,31 @@ class BaseSource {
       dolar = parseFloat(monto / usdPesos);
       bolivar = parseFloat(monto / bsPesos);
     }
+
+    // Check if the calculations went well
     if (pesos != null && dolar != null && bolivar != null && item.length == 4) {
       expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
       const message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
       response['success'] = true;
       response['message'] = message;
       this.sendMessage(message);
+      return {success: true, message};
     } else {
       const message = "ERROR: Verifique el formato del mensaje.";
-      response['message'] = message;
       this.sendMessage(message);
+      return {success: false, message};
     }
-    return response;
   }
 
-  cleanReportCells(otrosSheet) {
-    const dateIni = otrosSheet.getRange('G3');
-    const dateEnd = otrosSheet.getRange('H3');
-    const category = otrosSheet.getRange('I3');
-    const notes = otrosSheet.getRange('J3');
-    const statusReporte = otrosSheet.getRange('F3');
+  /**
+   * Set to their defaults value all report cells
+   */
+  cleanReportCells() {
+    const dateIni = this.otrosSheet.getRange('G3');
+    const dateEnd = this.otrosSheet.getRange('H3');
+    const category = this.otrosSheet.getRange('I3');
+    const notes = this.otrosSheet.getRange('J3');
+    const statusReporte = this.otrosSheet.getRange('F3');
 
     dateIni.setValue('');
     dateEnd.setValue('');
@@ -82,16 +117,20 @@ class BaseSource {
     statusReporte.setValue('FALSO');
   }
 
-
-  buildfinalReportMessage(otrosSheet) {
+  /**
+   * Use currency and calculations values to build the final 
+   * reporting message that will be send to the source
+   */
+  buildfinalReportMessage() {
     var message = 'Reporte final ';
-    const dateIni = Utilities.formatDate(new Date(otrosSheet.getRange('G3').getValue()), 'VET', 'MMMM dd, yyyy');
-    var dateEnd = otrosSheet.getRange('H3').getValue();
-    const category = otrosSheet.getRange('I3').getValue();
-    const notes = otrosSheet.getRange('J3').getValue();
-    const bsReportValue = otrosSheet.getRange('K3').getValue();
-    const copReportValue = otrosSheet.getRange('L3').getValue();
-    const dolarReportValue = otrosSheet.getRange('M3').getValue();
+
+    const dateIni = Utilities.formatDate(new Date(this.otrosSheet.getRange('G3').getValue()), 'VET', 'MMMM dd, yyyy');
+    var dateEnd = this.otrosSheet.getRange('H3').getValue();
+    const category = this.otrosSheet.getRange('I3').getValue();
+    const notes = this.otrosSheet.getRange('J3').getValue();
+    const bsReportValue = this.otrosSheet.getRange('K3').getValue();
+    const copReportValue = this.otrosSheet.getRange('L3').getValue();
+    const dolarReportValue = this.otrosSheet.getRange('M3').getValue();
 
     if (dateEnd == '-') {
       message += 'para ' + dateIni;
@@ -110,11 +149,15 @@ class BaseSource {
     return message;
   }
 
-  findEmptyReportCell(otrosSheet) {
-    const dateIni = otrosSheet.getRange('G2:G3');
-    const dateEnd = otrosSheet.getRange('H2:H3');
-    const category = otrosSheet.getRange('I2:I3');
-    const notes = otrosSheet.getRange('J2:J3');
+  /**
+   * Check for the incoming cell to be fill,
+   * the order for a report is: Date init -> Date end -> Category -> Note
+   */
+  findEmptyReportCell() {
+    const dateIni = this.otrosSheet.getRange('G2:G3');
+    const dateEnd = this.otrosSheet.getRange('H2:H3');
+    const category = this.otrosSheet.getRange('I2:I3');
+    const notes = this.otrosSheet.getRange('J2:J3');
 
     return (dateIni.getValues()[1][0] == '' && dateIni)
       || (dateEnd.getValues()[1][0] == '' && dateEnd)
@@ -122,38 +165,53 @@ class BaseSource {
       || (notes.getValues()[1][0] == '' && notes)
   }
 
+  /**
+   * Check if the report just start or it's in process,
+   * then fill the next cell in order
+   */
   processReport() {
-    const otrosSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('otros');
+    // If it just start send the respective message 
+    // and start asking for next cell to be filled out
     if (this.text == '/reporte') {
-      const statusReporte = otrosSheet.getRange('F3');
-      this.cleanReportCells(otrosSheet);
+      const statusReporte = this.otrosSheet.getRange('F3');
+      this.cleanReportCells(this.otrosSheet);
       statusReporte.setValue('VERDADERO');
       this.sendMessage("El reporte ah iniciado...");
     } else {
-      this.fillReportCell(otrosSheet);
+      // If the report it's in progress it continues filling out the next cell
+      this.fillReportCell(this.otrosSheet);
     }
-    const currentCell = this.findEmptyReportCell(otrosSheet);
+
+    // at the end of the process we ask for the next incoming cell
+    const currentCell = this.findEmptyReportCell(this.otrosSheet);
     if (currentCell) {
       this.sendMessage("Ingrese " + currentCell.getValues()[0][0] + ":");
     } else {
+
+      // But if the report it's done we build the 
+      // final report result in a single text format
       const finalReportMessage = this.buildfinalReportMessage(otrosSheet)
       this.sendMessage(finalReportMessage);
+
+      // and clean the cells for a next report
       this.cleanReportCells(otrosSheet);
     }
   }
 
-  fillReportCell(otrosSheet) {
-    const currentCell = this.findEmptyReportCell(otrosSheet);
+  /**
+   * Fill the next empty cell in order in order to build a report
+   */
+  fillReportCell() {
+    const currentCell = this.findEmptyReportCell(this.otrosSheet);
     var values = currentCell.getValues();
     values[1][0] = this.text;
     currentCell.setValues(values);
   }
 
   cleanReport() {
-    const otrosSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('otros');
-    const statusReporte = otrosSheet.getRange('F3');
+    const statusReporte = this.otrosSheet.getRange('F3');
     if (statusReporte.getValue() == 'VERDADERO') {
-      this.cleanReportCells(otrosSheet);
+      this.cleanReportCells(this.otrosSheet);
       this.sendMessage("El reporte ah finalizado brother!");
     }
   }
