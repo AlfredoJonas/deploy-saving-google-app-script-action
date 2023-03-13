@@ -13,7 +13,7 @@ class BaseSource {
   }
 
   checkReport() {
-    const otrosSheet = SpreadsheetApp.openById(ssId).getSheetByName('otros');
+    const otrosSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('otros');
     return (this.text == '/reporte' || otrosSheet.getRange('F3').getValue() == 'VERDADERO');
   }
 
@@ -28,7 +28,7 @@ class BaseSource {
       message: null
     };
     
-    const expenseSheet = SpreadsheetApp.openById(ssId).getSheetByName('Gastos diarios');
+    const expenseSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('Gastos diarios');
     const nowDate = new Date();
     const date = formatDate(nowDate);
     const item = this.text.split(' - ');
@@ -123,7 +123,7 @@ class BaseSource {
   }
 
   processReport() {
-    const otrosSheet = SpreadsheetApp.openById(ssId).getSheetByName('otros');
+    const otrosSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('otros');
     if (this.text == '/reporte') {
       statusReporte = otrosSheet.getRange('F3');
       this.cleanReportCells(otrosSheet);
@@ -150,7 +150,7 @@ class BaseSource {
   }
 
   cleanReport() {
-    const otrosSheet = SpreadsheetApp.openById(ssId).getSheetByName('otros');
+    const otrosSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('otros');
     const statusReporte = otrosSheet.getRange('F3');
     if (statusReporte.getValue() == 'VERDADERO') {
       this.cleanReportCells(otrosSheet);
