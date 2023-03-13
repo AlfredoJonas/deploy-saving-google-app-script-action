@@ -8,7 +8,7 @@ function setWebhook() {
 
 function doPost(e) {
   const contents = JSON.parse(e.postData.contents);
-  telegramBot = new TelegramBot(contents.message.text, contents.message.from.id);
+  const telegramBot = new TelegramBot(contents.message.text, contents.message.from.id);
   if (telegramBot.authenticate()) {
     if (text == '/finreporte') {
       telegramBot.cleanReport();
