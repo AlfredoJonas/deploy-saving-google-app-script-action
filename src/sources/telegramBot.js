@@ -5,7 +5,7 @@ class TelegramBot extends BaseSource {
     }
 
     authenticate() {
-        return PropertiesService.getScriptProperties().getProperty('telegramUserIds').split(',').includes(this.telegramUserId);
+        return PROPERTIES.getProperty('telegramUserIds').split(',').includes(this.telegramUserId);
     }
 
     sendMessage() {
