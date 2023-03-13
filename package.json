@@ -1,0 +1,16 @@
+{
+	"name": "savings-sheet-service",
+	"description": "A Google script app that connects with text services such as Telegram bot or Twillio sms callbacks that helps track spending in a Google Sheet",
+	"version": "2.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"test:unit": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
+	},
+	"devDependencies": {
+		"jest": "^29.5.*"
+	},
+	"dependencies": {
+		"import-fixer": "^0.8.2204282156"
+	}
+}
