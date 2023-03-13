@@ -1,7 +1,7 @@
 class TelegramBot extends BaseSource {
     constructor(text, telegramUserId) {
         super(text);
-        this.telegramUserId = telegramUserId;
+        this.telegramUserId = new String(telegramUserId);
     }
 
     authenticate() {
