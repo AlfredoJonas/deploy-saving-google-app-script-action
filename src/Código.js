@@ -35,9 +35,9 @@ function proccessExpenseMessage(text, id){
   const bsUsd = parseFloat(currencyData['USD']['promedio']);
   const bsPesos = parseFloat(currencyData['COL']['compra']);
   const usdPesos = parseFloat(currencyData['USDCOL']['ratetrm']);
-  var pesos = null;
-  var dolar = null;
-  var bolivar = null;
+  let pesos = null;
+  let dolar = null;
+  let bolivar = null;
   
   if (item[1] == 'Bolivar') {
     pesos = parseFloat(monto * bsPesos);
