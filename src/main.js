@@ -34,7 +34,6 @@ function doPost(e) {
       telegramBot.processReport();
     } else {
       telegramBot.proccessExpenseMessage();
-      console.info(response);
     }
   } else {
     // UNAUTHORIZED
