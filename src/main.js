@@ -33,7 +33,8 @@ function doPost(e) {
     } else if (telegramBot.checkReport()) {
       telegramBot.processReport();
     } else {
-      telegramBot.proccessExpenseMessage();
+      response = telegramBot.proccessExpenseMessage();
+      console.info(response);
     }
   } else {
     // UNAUTHORIZED
