@@ -14,7 +14,7 @@ class BaseSource {
     /** @private */
     this.text = text;
     /** @private */
-    this.otrosSheet = SpreadsheetApp.openById(PROPERTIES.getProperty('ssId')).getSheetByName('otros');
+    this.otrosSheet = SpreadsheetApp.openById(SETTINGS.getProperty('ssId')).getSheetByName('otros');
   }
 
   /**
@@ -47,7 +47,7 @@ class BaseSource {
    * being stored from the dolartoday.com web page
    */
   getCurrencyInfo() {
-    const response = UrlFetchApp.fetch(PROPERTIES.getProperty('exchangeUrl'));
+    const response = UrlFetchApp.fetch(SETTINGS.getProperty('exchangeUrl'));
     return JSON.parse(response.getContentText());
   }
 
@@ -56,7 +56,7 @@ class BaseSource {
    * to save a new expense record on the Google Sheet
    */
   proccessExpenseMessage() {
-    const ssId = PROPERTIES.getProperty('ssId');
+    const ssId = SETTINGS.getProperty('ssId');
     const expenseSheet = SpreadsheetApp.openById(ssId).getSheetByName('Gastos diarios');
     const nowDate = new Date();
     const date = formatDate(nowDate);
