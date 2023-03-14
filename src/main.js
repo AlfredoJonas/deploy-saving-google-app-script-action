@@ -1,12 +1,12 @@
-const PROPERTIES = PropertiesService.getScriptProperties();
+const SETTINGS = PropertiesService.getScriptProperties();
 
  /**
    * Used as a single call from the Google AppScript IDE to 
    * set a webhook from telegram back to the google script
    */
 function setWebhook() {
-  const webAppUrl = PROPERTIES.getProperty('webAppUrl');
-  const url = PROPERTIES.getProperty('telegramUrl') + PROPERTIES.getProperty('telegramToken') + '/setWebhook?url=' + webAppUrl;
+  const webAppUrl = SETTINGS.getProperty('webAppUrl');
+  const url = SETTINGS.getProperty('telegramUrl') + SETTINGS.getProperty('telegramToken') + '/setWebhook?url=' + webAppUrl;
   UrlFetchApp.fetch(url);
 }
 
@@ -34,7 +34,6 @@ function doPost(e) {
       telegramBot.processReport();
     } else {
       telegramBot.proccessExpenseMessage();
-      console.info(response);
     }
   } else {
     // UNAUTHORIZED
