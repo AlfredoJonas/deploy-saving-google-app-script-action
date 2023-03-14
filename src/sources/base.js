@@ -70,7 +70,7 @@ class BaseSource {
     let dolar = null;
     let bolivar = null;
     let message = null;
-
+    this.sendMessage("DEBUG 1");
     // Calculate all the currences to keep a history record
     if (item[1] == 'Bolivar') {
       pesos = parseFloat(monto * bsPesos);
@@ -85,13 +85,16 @@ class BaseSource {
       dolar = parseFloat(monto / usdPesos);
       bolivar = parseFloat(monto / bsPesos);
     }
+    this.sendMessage("DEBUG 2");
 
     // Check if the calculations went well
     if (pesos != null && dolar != null && bolivar != null && item.length == 4) {
+    this.sendMessage("DEBUG 3");
       expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
       message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
       this.sendMessage(message);
     } else {
+      this.sendMessage("DEBUG 4");
       message = "ERROR: Verifique el formato del mensaje.";
       this.sendMessage(message);
     }
