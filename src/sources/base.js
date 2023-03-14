@@ -66,9 +66,10 @@ class BaseSource {
     const bsUsd = parseFloat(currencyData['USD']['promedio']);
     const bsPesos = parseFloat(currencyData['COL']['compra']);
     const usdPesos = parseFloat(currencyData['USDCOL']['ratetrm']);
-    var pesos = null;
-    var dolar = null;
-    var bolivar = null;
+    let pesos = null;
+    let dolar = null;
+    let bolivar = null;
+    let message = null;
 
     // Calculate all the currences to keep a history record
     if (item[1] == 'Bolivar') {
@@ -88,13 +89,11 @@ class BaseSource {
     // Check if the calculations went well
     if (pesos != null && dolar != null && bolivar != null && item.length == 4) {
       expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
-      const message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
-      response['success'] = true;
-      response['message'] = message;
+      message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
       this.sendMessage(message);
       return {success: true, message};
     } else {
-      const message = "ERROR: Verifique el formato del mensaje.";
+      message = "ERROR: Verifique el formato del mensaje.";
       this.sendMessage(message);
       return {success: false, message};
     }
