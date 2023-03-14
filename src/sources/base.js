@@ -91,11 +91,9 @@ class BaseSource {
       expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
       message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
       this.sendMessage(message);
-      return {success: true, message};
     } else {
       message = "ERROR: Verifique el formato del mensaje.";
       this.sendMessage(message);
-      return {success: false, message};
     }
   }
 
