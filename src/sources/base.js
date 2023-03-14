@@ -10,12 +10,11 @@ class BaseSource {
    * @param  {[string]} text [formated text from the source]
    */
   constructor(text) {
-    this.ssId = PROPERTIES.getProperty('ssId');
     //class members. Should be private. 
     /** @private */
     this.text = text;
     /** @private */
-    this.otrosSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('otros');
+    this.otrosSheet = SpreadsheetApp.openById(PROPERTIES.getProperty('ssId')).getSheetByName('otros');
   }
 
   /**
@@ -57,7 +56,8 @@ class BaseSource {
    * to save a new expense record on the Google Sheet
    */
   proccessExpenseMessage() {
-    const expenseSheet = SpreadsheetApp.openById(this.ssId).getSheetByName('Gastos diarios');
+    const ssId = PROPERTIES.getProperty('ssId');
+    const expenseSheet = SpreadsheetApp.openById(ssId).getSheetByName('Gastos diarios');
     const nowDate = new Date();
     const date = formatDate(nowDate);
     const item = this.text.split(' - ');
