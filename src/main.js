@@ -33,7 +33,7 @@ function doPost(e) {
     } else if (telegramBot.checkReport()) {
       telegramBot.processReport();
     } else {
-      response = telegramBot.proccessExpenseMessage();
+      telegramBot.proccessExpenseMessage();
       console.info(response);
     }
   } else {
