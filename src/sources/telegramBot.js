@@ -1,4 +1,4 @@
-class TelegramBot extends BaseSource {
+export class TelegramBot extends BaseSource {
   constructor(text, telegramUserId) {
     super(text);
     //class members. Should be private. 

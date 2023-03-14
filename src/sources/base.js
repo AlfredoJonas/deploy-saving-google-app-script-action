@@ -1,4 +1,4 @@
-class BaseSource {
+export class BaseSource {
   /**
      * Allow to process text from different sources, saving expenses 
      * records on a Google Sheet based on the recived text format
