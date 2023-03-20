@@ -19,9 +19,6 @@ jobs:
         branches: [carmen-uzcategui, jonas-gonzalez]
     steps:
       - uses: actions/checkout@main
-      - name: Increase scheduled deploy version in one to keep credentials uptodated
-        id: set-scheduled-deploy-version
-        run: jq '.scheduledDeployVersion = "${{.scheduledDeployVersion + 1}}"' package.json > /tmp/package.json && mv /tmp/package.json package.json
       - uses: Embraser01/update-git-branch-action@v1.0.0
         if: github.ref == 'refs/heads/main'
         with:
