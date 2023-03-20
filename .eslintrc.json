@@ -3,7 +3,14 @@
         "browser": true,
         "es2021": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        "prettier"
+    ],
+    "plugins": [
+      "import",
+      "prettier"
+    ],
     "overrides": [
     ],
     "parserOptions": {
@@ -11,5 +18,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "import/no-unresolved": 0,
+        "import/namespace": 0
     }
 }
