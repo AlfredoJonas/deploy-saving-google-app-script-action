@@ -30,12 +30,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-<<<<<<< HEAD
-    environment: Jonas Gonzalez
-
-=======
     if: ${{github.event_name	!= 'schedule'}}
->>>>>>> main
+    environment: Jonas Gonzalez
     steps:
       - name: Install clasp
         id: install-clasp
