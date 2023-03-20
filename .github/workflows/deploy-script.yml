@@ -7,28 +7,35 @@ on:
   release:
     types: [published]
   schedule:
-    - cron: "45 16 * * *"
+    - cron: "0 17 * * *"
 
 jobs:
   scheduledCredentialsUpdate:
+    runs-on: ubuntu-latest
     if: ${{github.event_name	== 'schedule'}}
     name: Update scheduled deploy version to keep credentials uptodated
     strategy:
       matrix:
         branches: [carmen-uzcategui, jonas-gonzalez]
-    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@main
-    - uses: Embraser01/update-git-branch-action@v1.0.0
-      if: github.ref == 'refs/heads/main'
-      with:
-        branch: ${{ matrix.branches }}
-        githubToken: ${{ secrets.REPO_ACCESS_TOKEN }}
+      - uses: actions/checkout@main
+      - name: Increase scheduled deploy version in one to keep credentials uptodated
+        id: set-scheduled-deploy-version
+        run: jq '.scheduledDeployVersion = "${{.scheduledDeployVersion + 1}}"' package.json > /tmp/package.json && mv /tmp/package.json package.json
+      - uses: Embraser01/update-git-branch-action@v1.0.0
+        if: github.ref == 'refs/heads/main'
+        with:
+          branch: ${{ matrix.branches }}
+          githubToken: ${{ secrets.REPO_ACCESS_TOKEN }}
 
   deploy:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     environment: Jonas Gonzalez
 
+=======
+    if: ${{github.event_name	!= 'schedule'}}
+>>>>>>> main
     steps:
       - name: Install clasp
         id: install-clasp
@@ -64,19 +71,17 @@ jobs:
 
       - name: Checkout repo
         id: checkout-repo
-        if: ${{github.event_name	!= 'schedule' }}
         uses: actions/checkout@v2
 
       - name: Set scriptId in .clasp.json file
         id: set-script-id
-        if: ${{ github.event_name	!= 'schedule' && env.SCRIPT_ID}}
+        if: ${{env.SCRIPT_ID}}
         run: jq '.scriptId = "${{env.SCRIPT_ID}}"' .clasp.json > /tmp/.clasp.json && mv /tmp/.clasp.json .clasp.json
         env:
           SCRIPT_ID: ${{secrets.SCRIPT_ID}}
 
       - name: Push script to scripts.google.com
         id: clasp-push
-        if: ${{ github.event_name	!= 'schedule'}}
         run: clasp push -f
 
       - name: Deploy Script
