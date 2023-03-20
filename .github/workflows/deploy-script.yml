@@ -7,7 +7,7 @@ on:
   release:
     types: [published]
   schedule:
-    - cron: "0 17 * * *"
+    - cron: "15 17 * * *"
 
 jobs:
   scheduledCredentialsUpdate:
