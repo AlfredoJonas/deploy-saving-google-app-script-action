@@ -9,3 +9,7 @@ git push origin jonas-gonzalez
 git checkout carmen-uzcategui
 git merge main
 git push origin carmen-uzcategui
+
+git checkout angelica-gonzalez
+git merge main
+git push origin angelica-gonzalez
