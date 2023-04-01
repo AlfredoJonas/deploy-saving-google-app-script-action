@@ -3,7 +3,7 @@ name: Deploy Script
 on:
   workflow_dispatch:
   push:
-    branches: [carmen-uzcategui, jonas-gonzalez]
+    branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez]
   release:
     types: [published]
   schedule:
