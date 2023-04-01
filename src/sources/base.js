@@ -187,7 +187,7 @@ class BaseSource {
 
       // But if the report it's done we build the 
       // final report result in a single text format
-      const finalReportMessage = this.buildfinalReportMessage(otrosSheet)
+      const finalReportMessage = this.buildfinalReportMessage();
       this.sendMessage(finalReportMessage);
 
       // and clean the cells for a next report
