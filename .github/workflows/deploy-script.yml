@@ -28,6 +28,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{github.event_name	!= 'schedule'}}
+    environment: Maldonado Perez
     steps:
       - name: Install clasp
         id: install-clasp
