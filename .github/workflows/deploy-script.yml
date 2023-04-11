@@ -3,7 +3,7 @@ name: Deploy Script
 on:
   workflow_dispatch:
   push:
-    branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez]
+    branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez, maldonado-perez]
   release:
     types: [published]
   schedule:
@@ -16,7 +16,7 @@ jobs:
     name: Update scheduled deploy version to keep credentials uptodated
     strategy:
       matrix:
-        branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez]
+        branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez, maldonado-perez]
     steps:
       - uses: actions/checkout@main
       - uses: Embraser01/update-git-branch-action@v1.0.0
