@@ -1,3 +1,5 @@
+import BaseSource from "./base";
+
 class TelegramBot extends BaseSource {
   constructor(text, telegramUserId) {
     super(text);
@@ -16,3 +18,5 @@ class TelegramBot extends BaseSource {
     UrlFetchApp.fetch(url);
   }
 }
+
+export default TelegramBot;
