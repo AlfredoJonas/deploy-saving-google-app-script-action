@@ -7,7 +7,7 @@ on:
   release:
     types: [published]
   schedule:
-    - cron: "27 12 * * *"
+    - cron: "45 12 * * *"
 
 jobs:
   scheduledCredentialsUpdate:
@@ -27,9 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{github.event_name	!= 'schedule'}}
     steps:
-      - name: Install clasp and dependencies
+      - name: Install clasp
         id: install-clasp-and-dependencies
-        run: npm i && sudo npm install @google/clasp@2.4.* -g
+        run: sudo npm install @google/clasp@2.4.* -g
 
       - name: Write CLASPRC_JSON secret to .clasprc.json file
         id: write-clasprc
@@ -69,6 +69,13 @@ jobs:
         run: jq '.scriptId = "${{env.SCRIPT_ID}}"' .clasp.json > /tmp/.clasp.json && mv /tmp/.clasp.json .clasp.json
         env:
           SCRIPT_ID: ${{secrets.SCRIPT_ID}}
+      
+      - name: use node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - run: npm i
 
       - name: Build babel dist
         id: build-babel-dist
