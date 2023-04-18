@@ -23,8 +23,7 @@ This repository help us to setup an automatic [CI/CD](https://en.wikipedia.org/w
     * ssId: `SSID`
     * telegramToken: `telegramToken`
     * telegramUrl: 'https://api.telegram.org/bot'
-    * telegramUserId1: `telegramUserId`
-    * telegramUserId2: `telegramUserId`
+    * telegramUserIds: `telegramUserId1,telegramUserId2` ex: '9274547,18764182'
     * webAppUrl: It will be generated later at the end of the step processes in the readme instructions.
 
 ### Setup Git Branch Repository for a new bot with the persons name for better understanding
