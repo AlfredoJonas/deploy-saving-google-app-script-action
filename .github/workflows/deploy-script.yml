@@ -27,9 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{github.event_name	!= 'schedule'}}
     steps:
-      - name: Install clasp
-        id: install-clasp
-        run: sudo npm install @google/clasp@2.4.* -g
+      - name: Install clasp and dependencies
+        id: install-clasp-and-dependencies
+        run: sudo npm install @google/clasp@2.4.* -g & npm i
 
       - name: Write CLASPRC_JSON secret to .clasprc.json file
         id: write-clasprc
@@ -70,6 +70,10 @@ jobs:
         env:
           SCRIPT_ID: ${{secrets.SCRIPT_ID}}
 
+      - name: Build babel dist
+        id: build-babel-dist
+        run: npm run babel & cp ./src/appsscript.json ./dist/appsscript.json
+    
       - name: Push script to scripts.google.com
         id: clasp-push
         run: clasp push -f
