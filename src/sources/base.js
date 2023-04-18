@@ -1,3 +1,5 @@
+import formatDate from "../utils";
+
 class BaseSource {
   /**
      * Allow to process text from different sources, saving expenses 
@@ -213,3 +215,5 @@ class BaseSource {
     }
   }
 }
+
+export default BaseSource;
