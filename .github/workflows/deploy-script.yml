@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Install clasp and dependencies
         id: install-clasp-and-dependencies
-        run: sudo npm install @google/clasp@2.4.* -g & npm i
+        run: sudo npm install @google/clasp@2.4.* -g && npm i
 
       - name: Write CLASPRC_JSON secret to .clasprc.json file
         id: write-clasprc
@@ -73,7 +73,7 @@ jobs:
 
       - name: Build babel dist
         id: build-babel-dist
-        run: npm run babel & cp ./src/appsscript.json ./dist/appsscript.json
+        run: npm run babel && cp ./src/appsscript.json ./dist/appsscript.json
     
       - name: Push script to scripts.google.com
         id: clasp-push
