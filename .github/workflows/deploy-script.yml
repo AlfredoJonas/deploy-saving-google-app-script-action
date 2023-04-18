@@ -14,17 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{github.event_name	== 'schedule'}}
     name: Update scheduled deploy version to keep credentials uptodated
-    strategy:
-      matrix:
-        branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez, maldonado-perez]
     steps:
       - uses: actions/checkout@v3
         with:
           ref: main
       - uses: Embraser01/update-git-branch-action@v1.0.0
-        if: github.ref == 'refs/heads/main'
         with:
-          branch: ${{ matrix.branches }}
+          branch: jonas-gonzalez
           githubToken: ${{ secrets.REPO_ACCESS_TOKEN }}
 
   deploy:
