@@ -1,3 +1,5 @@
+import TelegramBot from "./sources/telegramBot";
+
 const SETTINGS = PropertiesService.getScriptProperties();
 
  /**
