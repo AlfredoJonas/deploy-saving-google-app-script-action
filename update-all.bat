@@ -13,3 +13,7 @@ git push origin carmen-uzcategui
 git checkout angelica-gonzalez
 git merge main
 git push origin angelica-gonzalez
+
+git checkout maldonado-perez
+git merge main
+git push origin maldonado-perez
