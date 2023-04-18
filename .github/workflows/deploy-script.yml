@@ -18,7 +18,9 @@ jobs:
       matrix:
         branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez, maldonado-perez]
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v3
+        with:
+          ref: main
       - uses: Embraser01/update-git-branch-action@v1.0.0
         if: github.ref == 'refs/heads/main'
         with:
