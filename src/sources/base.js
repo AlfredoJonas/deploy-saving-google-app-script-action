@@ -93,9 +93,11 @@ class BaseSource {
       expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
       message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
       this.sendMessage(message);
+      return {success: true, message};
     } else {
       message = "ERROR: Verifique el formato del mensaje.";
       this.sendMessage(message);
+      return {success: false, message};
     }
   }
 
@@ -169,13 +171,17 @@ class BaseSource {
    * then fill the next cell in order
    */
   processReport() {
+    let message = "Something bad happens, contact with support...";
+    let success = false;
     // If it just start send the respective message 
     // and start asking for next cell to be filled out
     if (this.text == '/reporte') {
       const statusReporte = this.otrosSheet.getRange('F3');
       this.cleanReportCells(this.otrosSheet);
       statusReporte.setValue('VERDADERO');
-      this.sendMessage("El reporte ah iniciado...");
+      message = "El reporte ah iniciado...";
+      success = true;
+      this.sendMessage(message);
     } else {
       // If the report it's in progress it continues filling out the next cell
       this.fillReportCell(this.otrosSheet);
@@ -184,17 +190,22 @@ class BaseSource {
     // at the end of the process we ask for the next incoming cell
     const currentCell = this.findEmptyReportCell(this.otrosSheet);
     if (currentCell) {
-      this.sendMessage("Ingrese " + currentCell.getValues()[0][0] + ":");
+      message = "Ingrese " + currentCell.getValues()[0][0] + ":";
+      success = true;
+      this.sendMessage(message);
     } else {
 
       // But if the report it's done we build the 
       // final report result in a single text format
-      const finalReportMessage = this.buildfinalReportMessage();
-      this.sendMessage(finalReportMessage);
+      message = this.buildfinalReportMessage();
+      success = true;
+      this.sendMessage(message);
 
       // and clean the cells for a next report
       this.cleanReportCells(otrosSheet);
     }
+
+    return {success, message};
   }
 
   /**
@@ -212,7 +223,9 @@ class BaseSource {
     if (statusReporte.getValue() == 'VERDADERO') {
       this.cleanReportCells(this.otrosSheet);
       this.sendMessage("El reporte ah finalizado brother!");
+      return true;
     }
+    return false;
   }
 }
 
