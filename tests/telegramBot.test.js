@@ -1,9 +1,14 @@
-import { TelegramBot } from "../src/sources/telegramBot.js";
+import TelegramBot from "../src/sources/telegramBot";
+import "./mocks";
 
-test('Check telegram bot expensive saving', function () {
-    const telegramBot = TelegramBot(contents.message.text, contents.message.from.id);
+test('Check telegram good authentication', () => {
+    const telegramBot = new TelegramBot("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino", 15123);
+    const response = telegramBot.authenticate();
+	expect(response).toBe(true);
+});
 
-    const response = telegramBot.proccessExpenseMessage();
-
-	expect(response['success']).toBe(true);
+test('Check telegram bad authentication', () => {
+    const telegramBot = new TelegramBot("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino", 32151);
+    const response = telegramBot.authenticate();
+	expect(response).toBe(false);
 });
