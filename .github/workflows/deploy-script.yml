@@ -25,6 +25,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{github.event_name	!= 'schedule'}} && success()
+    environment: Jonas Gonzalez
     steps:
       - name: Install clasp
         id: install-clasp-and-dependencies
