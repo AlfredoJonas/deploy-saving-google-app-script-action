@@ -1,0 +1,97 @@
+name: Deploy Script
+on:
+  workflow_dispatch:
+  push:
+    branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez, maldonado-perez]
+  release:
+    types: [published]
+  schedule:
+    - cron: "45 12 * * *"
+
+jobs:
+  scheduledCredentialsUpdate:
+    runs-on: ubuntu-latest
+    if: ${{github.event_name	== 'schedule'}}
+    name: Update scheduled deploy version to keep credentials uptodated
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+      - uses: Embraser01/update-git-branch-action@v1.0.0
+        with:
+          branch: jonas-gonzalez
+          githubToken: ${{ secrets.REPO_ACCESS_TOKEN }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{github.event_name	!= 'schedule'}} && success()
+    steps:
+      - name: Install clasp
+        id: install-clasp-and-dependencies
+        run: sudo npm install @google/clasp@2.4.* -g
+
+      - name: Write CLASPRC_JSON secret to .clasprc.json file
+        id: write-clasprc
+        run: echo "$CLASPRC_JSON_SECRET" >> ~/.clasprc.json
+        env:
+          CLASPRC_JSON_SECRET: ${{ secrets.CLASPRC_JSON }}
+
+      - name: Check clasp login status
+        id: clasp_login
+        run: clasp login --status
+
+      - name: Save current .clasprc.json contents to CLASPRC_JSON_FILE environment variable
+        id: save-clasprc
+        run: |
+          echo ::add-mask::$(tr -d '\n\r' < ~/.clasprc.json)
+          echo "CLASPRC_JSON_FILE=$(tr -d '\n\r' < ~/.clasprc.json)" >> $GITHUB_ENV        
+      
+      - name: Save CLASPRC_JSON_FILE environment variable to CLASPRC_JSON repo secret
+        id: set-clasprc-secret
+        if: ${{ env.CLASPRC_JSON_FILE != env.CLASPRC_JSON_SECRET  }}
+        uses: hmanzur/actions-set-secret@v2.0.0
+        env:
+          CLASPRC_JSON_SECRET: ${{ secrets.CLASPRC_JSON }}
+        with:
+          name: "CLASPRC_JSON"
+          value: ${{ env.CLASPRC_JSON_FILE }}
+          repository: ${{ github.repository }}
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+
+      - name: Checkout repo
+        id: checkout-repo
+        uses: actions/checkout@v2
+
+      - name: Set scriptId in .clasp.json file
+        id: set-script-id
+        if: ${{env.SCRIPT_ID}}
+        run: jq '.scriptId = "${{env.SCRIPT_ID}}"' .clasp.json > /tmp/.clasp.json && mv /tmp/.clasp.json .clasp.json
+        env:
+          SCRIPT_ID: ${{secrets.SCRIPT_ID}}
+      
+      - name: use node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - run: npm i
+      - run: npm run test
+
+      - name: Build babel dist
+        if: success()
+        id: build-babel-dist
+        run: npm run babel && cp ./src/appsscript.json ./dist/appsscript.json
+    
+      - name: Push script to scripts.google.com
+        if: success()
+        id: clasp-push
+        run: clasp push -f
+
+      - name: Deploy Script
+        if: success()
+        id: clasp-deploy
+        if: ${{env.DEPLOYMENT_ID && (github.event_name == 'release' || github.event_name == 'push')}}
+        run: clasp deploy -i "$DEPLOYMENT_ID" -d "$GITHUB_REF"
+        env:
+          DEPLOYMENT_ID: ${{ secrets.DEPLOYMENT_ID }}
+  
