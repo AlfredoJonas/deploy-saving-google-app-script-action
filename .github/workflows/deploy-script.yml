@@ -1,5 +1,4 @@
 name: Deploy Script
-
 on:
   workflow_dispatch:
   push:
@@ -25,8 +24,12 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     if: ${{github.event_name	!= 'schedule'}}
     environment: Angelica Gonzalez
+=======
+    if: ${{github.event_name	!= 'schedule'}} && success()
+>>>>>>> main
     steps:
       - name: Install clasp
         id: install-clasp-and-dependencies
@@ -77,18 +80,21 @@ jobs:
           node-version: 18.x
 
       - run: npm i
+      - run: npm run test
 
       - name: Build babel dist
+        if: success()
         id: build-babel-dist
         run: npm run babel && cp ./src/appsscript.json ./dist/appsscript.json
     
       - name: Push script to scripts.google.com
+        if: success()
         id: clasp-push
         run: clasp push -f
 
       - name: Deploy Script
         id: clasp-deploy
-        if: ${{env.DEPLOYMENT_ID && (github.event_name == 'release' || github.event_name == 'push')}}
+        if: success() && ${{env.DEPLOYMENT_ID && (github.event_name == 'release' || github.event_name == 'push')}}
         run: clasp deploy -i "$DEPLOYMENT_ID" -d "$GITHUB_REF"
         env:
           DEPLOYMENT_ID: ${{ secrets.DEPLOYMENT_ID }}
