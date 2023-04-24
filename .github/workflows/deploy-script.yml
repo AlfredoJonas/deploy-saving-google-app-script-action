@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: main
+          path: main
       - uses: Embraser01/update-git-branch-action@v1.0.0
         with:
           branch: jonas-gonzalez
@@ -24,8 +24,12 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     if: ${{github.event_name	!= 'schedule'}}
     environment: Angelica Gonzalez
+=======
+    if: ${{github.event_name	!= 'schedule' && success()}}
+>>>>>>> main
     steps:
       - name: Install clasp
         id: install-clasp-and-dependencies
