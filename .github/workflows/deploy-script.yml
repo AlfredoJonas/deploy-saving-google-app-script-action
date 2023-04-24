@@ -24,12 +24,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-<<<<<<< HEAD
     if: ${{github.event_name	!= 'schedule'}}
     environment: Angelica Gonzalez
-=======
-    if: ${{github.event_name	!= 'schedule' && success()}}
->>>>>>> main
     steps:
       - name: Install clasp
         id: install-clasp-and-dependencies
