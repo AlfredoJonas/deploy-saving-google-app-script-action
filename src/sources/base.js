@@ -65,7 +65,7 @@ class BaseSource {
     const nowDate = new Date();
     const date = formatDate(nowDate);
     const item = this.text.split(' - ');
-    const monto = parseFloat(item[2]);
+    const monto = parseFloat(item[2]).toFixed(2);
     const currencyData = this.getCurrencyInfo();
     const rates = currencyData['rates'];
     const eurUsd = parseFloat(rates['USD']);
@@ -80,17 +80,17 @@ class BaseSource {
 
     // Calculate all the currences to keep a history record
     if (item[1] == 'Bolivar') {
-      pesos = parseFloat(monto * pesoBs);
-      dolar = parseFloat(monto / bsUsd);
+      pesos = parseFloat(monto * pesoBs).toFixed(2);
+      dolar = parseFloat(monto / bsUsd).toFixed(2);
       bolivar = monto;
     } else if (item[1] == 'Dolar') {
-      pesos = parseFloat(monto * pesoUsd);
+      pesos = parseFloat(monto * pesoUsd).toFixed(2);
       dolar = monto;
-      bolivar = parseFloat(monto * bsUsd);
+      bolivar = parseFloat(monto * bsUsd).toFixed(2);
     } else if (item[1] == 'Peso') {
       pesos = monto;
-      dolar = parseFloat(monto / pesoUsd);
-      bolivar = parseFloat(monto / pesoBs);
+      dolar = parseFloat(monto / pesoUsd).toFixed(2);
+      bolivar = parseFloat(monto / pesoBs).toFixed(2);
     }
 
     // Check if the calculations went well
