@@ -49,7 +49,9 @@ class BaseSource {
    * being stored from the dolartoday.com web page
    */
   getCurrencyInfo() {
-    const response = UrlFetchApp.fetch(SETTINGS.getProperty('exchangeUrl'));
+    const access_key = SETTINGS.getProperty('exchangeratesapiAccessKey');
+    const exchangeUrl = `${SETTINGS.getProperty('exchangeUrl')}/latest?access_key=${access_key}&symbols =COP,VES,USD`;
+    const response = UrlFetchApp.fetch(exchangeUrl);
     return JSON.parse(response.getContentText());
   }
 
@@ -65,9 +67,12 @@ class BaseSource {
     const item = this.text.split(' - ');
     const monto = parseFloat(item[2]);
     const currencyData = this.getCurrencyInfo();
-    const bsUsd = parseFloat(currencyData['USD']['promedio']);
-    const bsPesos = parseFloat(currencyData['COL']['compra']);
-    const usdPesos = parseFloat(currencyData['USDCOL']['ratetrm']);
+    const rates = currencyData['rates'];
+    const eurUsd = parseFloat(rates['USD']);
+    const eurVes = parseFloat(rates['USD']);
+    const bsUsd = parseFloat(rates['VES'])/eurUsd;
+    const pesoUsd = parseFloat(rates['COP'])/eurUsd;
+    const pesoBs = parseFloat(rates['COP'])/eurVes;
     let pesos = null;
     let dolar = null;
     let bolivar = null;
@@ -75,23 +80,23 @@ class BaseSource {
 
     // Calculate all the currences to keep a history record
     if (item[1] == 'Bolivar') {
-      pesos = parseFloat(monto * bsPesos);
+      pesos = parseFloat(monto * pesoBs);
       dolar = parseFloat(monto / bsUsd);
       bolivar = monto;
     } else if (item[1] == 'Dolar') {
-      pesos = parseFloat(monto * usdPesos);
+      pesos = parseFloat(monto * pesoUsd);
       dolar = monto;
       bolivar = parseFloat(monto * bsUsd);
     } else if (item[1] == 'Peso') {
       pesos = monto;
-      dolar = parseFloat(monto / usdPesos);
-      bolivar = parseFloat(monto / bsPesos);
+      dolar = parseFloat(monto / pesoUsd);
+      bolivar = parseFloat(monto / pesoBs);
     }
 
     // Check if the calculations went well
     if (pesos != null && dolar != null && bolivar != null && item.length == 4) {
       expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
-      message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
+      message = "Gasto guardado exitosamente. Tipo de cambios: BS/USD=" + bsUsd + " COP/BS=" + pesoBs + " COP/USD=" + pesoUsd;
       this.sendMessage(message);
       return {success: true, message};
     } else {
