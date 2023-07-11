@@ -96,7 +96,7 @@ class BaseSource {
     // Check if the calculations went well
     if (pesos != null && dolar != null && bolivar != null && item.length == 4) {
       expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
-      message = "Gasto guardado exitosamente. Tipo de cambios: BS/USD=" + bsUsd + " COP/BS=" + pesoBs + " COP/USD=" + pesoUsd;
+      message = "Gasto guardado exitosamente. Tipo de cambios: BS/USD=" + bsUsd.toFixed(2) + " COP/BS=" + pesoBs.toFixed(2) + " COP/USD=" + pesoUsd.toFixed(2);
       this.sendMessage(message);
       return {success: true, message};
     } else {
