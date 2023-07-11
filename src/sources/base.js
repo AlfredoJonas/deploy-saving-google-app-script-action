@@ -69,7 +69,7 @@ class BaseSource {
     const currencyData = this.getCurrencyInfo();
     const rates = currencyData['rates'];
     const eurUsd = parseFloat(rates['USD']);
-    const eurVes = parseFloat(rates['USD']);
+    const eurVes = parseFloat(rates['VES']);
     const bsUsd = parseFloat(rates['VES'])/eurUsd;
     const pesoUsd = parseFloat(rates['COP'])/eurUsd;
     const pesoBs = parseFloat(rates['COP'])/eurVes;
