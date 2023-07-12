@@ -7,6 +7,7 @@ class TelegramBot extends BaseSource {
     // Used as a string field to check which telegram users has access to this service
     /** @private */
     this.telegramUserId = "" + telegramUserId;
+    this.telegramUrl = SETTINGS.getProperty('telegramUrl') + SETTINGS.getProperty('telegramToken') + '/sendMessage?chat_id=' + this.telegramUserId;
   }
 
   authenticate() {
@@ -14,8 +15,11 @@ class TelegramBot extends BaseSource {
   }
 
   sendMessage(text) {
-    const url = SETTINGS.getProperty('telegramUrl') + SETTINGS.getProperty('telegramToken') + '/sendMessage?chat_id=' + this.telegramUserId + '&text=' + text;
-    UrlFetchApp.fetch(url);
+    try {
+      UrlFetchApp.fetch(this.telegramUrl + '&text=' + text);
+    } catch (error) {
+      console.log(error.message + ' | ' + "ERROR: Fallo al enviar el mensaje: " + text);
+    }
   }
 }
 
