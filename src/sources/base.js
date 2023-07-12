@@ -49,8 +49,8 @@ class BaseSource {
    * being stored from the dolartoday.com web page
    */
   getCurrencyInfo() {
-    const response = UrlFetchApp.fetch(SETTINGS.getProperty('exchangeUrl'));
     try {
+      const response = UrlFetchApp.fetch(SETTINGS.getProperty('exchangeUrl'));
       return JSON.parse(response.getContentText());
     } catch (error) {
       throw new Error("ERROR: Fallo al obtener la informacion de las tasas de cambio.");
