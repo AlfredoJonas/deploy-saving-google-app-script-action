@@ -49,8 +49,10 @@ class BaseSource {
    * being stored from the dolartoday.com web page
    */
   getCurrencyInfo() {
+    const access_key = SETTINGS.getProperty('exchangeratesapiAccessKey');
+    const exchangeUrl = `${SETTINGS.getProperty('exchangeUrl')}/latest?access_key=${access_key}&symbols =COP,VES,USD`;
     try {
-      const response = UrlFetchApp.fetch(SETTINGS.getProperty('exchangeUrl'));
+      const response = UrlFetchApp.fetch(exchangeUrl);
       return JSON.parse(response.getContentText());
     } catch (error) {
       throw new Error("ERROR: Fallo al obtener la informacion de las tasas de cambio.");
@@ -68,11 +70,14 @@ class BaseSource {
       const nowDate = new Date();
       const date = formatDate(nowDate);
       const item = this.text.split(' - ');
-      const monto = parseFloat(item[2]);
+      const monto = parseFloat(item[2]).toFixed(2);
       const currencyData = this.getCurrencyInfo();
-      const bsUsd = parseFloat(currencyData['USD']['promedio']);
-      const bsPesos = parseFloat(currencyData['COL']['compra']);
-      const usdPesos = parseFloat(currencyData['USDCOL']['ratetrm']);
+      const rates = currencyData['rates'];
+      const eurUsd = parseFloat(rates['USD']);
+      const eurVes = parseFloat(rates['VES']);
+      const bsUsd = parseFloat(rates['VES'])/eurUsd;
+      const pesoUsd = parseFloat(rates['COP'])/eurUsd;
+      const pesoBs = parseFloat(rates['COP'])/eurVes;
       let pesos = null;
       let dolar = null;
       let bolivar = null;
@@ -80,28 +85,29 @@ class BaseSource {
 
       // Calculate all the currences to keep a history record
       if (item[1] == 'Bolivar') {
-        pesos = parseFloat(monto * bsPesos);
-        dolar = parseFloat(monto / bsUsd);
+        pesos = parseFloat(monto * pesoBs).toFixed(2);
+        dolar = parseFloat(monto / bsUsd).toFixed(2);
         bolivar = monto;
       } else if (item[1] == 'Dolar') {
-        pesos = parseFloat(monto * usdPesos);
+        pesos = parseFloat(monto * pesoUsd).toFixed(2);
         dolar = monto;
-        bolivar = parseFloat(monto * bsUsd);
+        bolivar = parseFloat(monto * bsUsd).toFixed(2);
       } else if (item[1] == 'Peso') {
         pesos = monto;
-        dolar = parseFloat(monto / usdPesos);
-        bolivar = parseFloat(monto / bsPesos);
+        dolar = parseFloat(monto / pesoUsd).toFixed(2);
+        bolivar = parseFloat(monto / pesoBs).toFixed(2);
       }
 
       // Check if the calculations went well
       if (pesos != null && dolar != null && bolivar != null && item.length == 4) {
         expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
-        message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
+        message = "Gasto guardado exitosamente. Tipo de cambios: BS/USD=" + bsUsd.toFixed(2) + " COP/BS=" + pesoBs.toFixed(2) + " COP/USD=" + pesoUsd.toFixed(2);
         this.sendMessage(message);
         return {success: true, message};
       } else {
         throw new Error("ERROR: Verifique el formato del mensaje.");
       }
+      
     } catch (error) {
       console.log(error);
       this.sendMessage(error.message);

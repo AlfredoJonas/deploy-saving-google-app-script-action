@@ -5,7 +5,7 @@ test('Process an expensive record with a good format', () => {
     const telegramBot = new MockedBaseSource("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino");
     telegramBot.sendMessage = jest.fn();
     telegramBot.proccessExpenseMessage();
-	expect(telegramBot.sendMessage).toBeCalledWith("Gasto guardado exitosamente. Tipo de cambios: Bs/USD=24.95 Bs/COP=174 USD/COP=4640");
+	expect(telegramBot.sendMessage).toBeCalledWith("Gasto guardado exitosamente. Tipo de cambios: BS/USD=28.17 COP/BS=148.79 COP/USD=4191.66");
 });
 
 test('Process an expensive record with wrong text format', () => {
