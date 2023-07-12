@@ -26,19 +26,22 @@ function doPost(e) {
   // the text and save or generate report for expenses info
   const telegramBot = new TelegramBot(text, contents.message.from.id);
 
-  // Checking if the user is authorized to use this service
-  if (telegramBot.authenticate()) {
-
-  // Check what type of action is asking the user
-    if (text == '/finreporte') {
-      telegramBot.cleanReport();
-    } else if (telegramBot.checkReport()) {
-      telegramBot.processReport();
+  try {
+    // Checking if the user is authorized to use this service
+    if (telegramBot.authenticate()) {
+      // Check what type of action is asking the user
+        if (text == '/finreporte') {
+          telegramBot.cleanReport();
+        } else if (telegramBot.checkReport()) {
+          telegramBot.processReport();
+        } else {
+          telegramBot.proccessExpenseMessage();
+        }
     } else {
-      telegramBot.proccessExpenseMessage();
+      // UNAUTHORIZED
+      throw new Error("ACCESS ERROR: you can't use this service.");
     }
-  } else {
-    // UNAUTHORIZED
-    telegramBot.sendMessage("ACCESS ERROR: you can't use this service.");
+  } catch (error) {
+    telegramBot.sendMessage(error.message);
   }
 }
