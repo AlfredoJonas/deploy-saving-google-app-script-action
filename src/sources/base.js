@@ -72,7 +72,7 @@ class BaseSource {
     this.otrosSheet.getRange('G3').setValue(firstDayOfMonth);
     this.otrosSheet.getRange('H3').setValue(currentDate);
     this.otrosSheet.getRange('I3').setValue(category);
-    const dolarReportValue = parseFloat(this.otrosSheet.getRange('M3').getValue()) + parseFloat(montoDolares);
+    const dolarReportValue = parseFloat(this.otrosSheet.getRange('M3').getValue());
     budgetSheet.getRange('A3').setValue(category);
     const budgetDolares = parseFloat(budgetSheet.getRange('B3').getValue());
     if (budgetDolares > 0 && dolarReportValue > budgetDolares) {
