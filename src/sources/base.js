@@ -100,7 +100,7 @@ class BaseSource {
         const expenseAdded = "\n  GASTO: fecha=" + date + " | Categoria=" + item[0] + " | dolares=" + dolares + ", pesos=" + pesos + ", bolivares=" + bolivares;
         const exchangeRates = "\n  Tasas de cambios: Bs/USD=" + bsUsd + " | Bs/COP=" + bsPesos + " | USD/COP=" + usdPesos
         this.sendMessage(message + expenseAdded + exchangeRates);
-        this.checkBudget(dolares, item[1]);
+        this.checkBudget(dolares, item[0]);
       } else {
         throw new Error("ERROR: Verifique el formato del mensaje.");
       }
