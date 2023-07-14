@@ -8,7 +8,7 @@ test('Process an expensive record with a good format and budget', () => {
     const message = "Gasto guardado exitosamente!";
     const expenseAdded = "\n\nGASTO: fecha=2023/7/14 | Categoria=Conocimiento";
     const ratesMessage = "\n     dolares=14.31, pesos=60000, bolivares=403.25";
-    const exchangeRates = "\nTasas de cambios: BS/USD=28.17 | COP/BS=148.79 | COP/USD=4191.66";
+    const exchangeRates = "\nTasas de cambios: \n     BS/USD=28.17 | COP/BS=148.79 | COP/USD=4191.66";
 	expect(telegramBot.sendMessage).toHaveBeenCalledWith(message + expenseAdded + ratesMessage + exchangeRates);
 });
 
@@ -22,8 +22,8 @@ test('Process an expensive record with a good format and higher amount than budg
     const message = "Gasto guardado exitosamente!";
     const expenseAdded = "\n\nGASTO: fecha=2023/7/14 | Categoria=Conocimiento";
     const ratesMessage = "\n     dolares=14.31, pesos=60000, bolivares=403.25";
-    const exchangeRates = "\nTasas de cambios: BS/USD=28.17 | COP/BS=148.79 | COP/USD=4191.66";
-	const budgetReport = "\n\n WARNING: Los gastos para la categoria Conocimiento superan el presupuesto(20$) del presente mes.";
+    const exchangeRates = "\nTasas de cambios: \n     BS/USD=28.17 | COP/BS=148.79 | COP/USD=4191.66";
+	const budgetReport = "\n\n PILAS: Los gastos para la categoria Conocimiento superan el presupuesto(20$) del presente mes.";
     expect(telegramBot.sendMessage).toHaveBeenCalledWith(message + expenseAdded + ratesMessage + exchangeRates + budgetReport);
 });
 
