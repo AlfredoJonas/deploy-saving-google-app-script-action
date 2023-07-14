@@ -1,14 +1,26 @@
 import BaseSource from "../src/sources/base";
 
 global.SpreadsheetApp = {
+    constants: {
+        budget: 15.5,
+    },
     openById: () => ({
         getSheetByName: () => ({
-            getRange: () => ({
-                getValue: () => "VERDADERO",
-                getValues: () => ([["key"],[""]]),
-                setValue: (value) => value,
-                setValues: (values) => values,
-            }),
+            getRange: (range) => {
+                const returnValues = {
+                    getValue: () => "VERDADERO",
+                    getValues: () => ([["key"],[""]]),
+                    setValue: (value) => value,
+                    setValues: (values) => values,
+                };
+                switch (range) {
+                    case "B3":
+                        returnValues.getValue = () => global.SpreadsheetApp.constants.budget;
+                        return returnValues;
+                    default:
+                        return returnValues;
+                }
+            },
             appendRow: () => {},
         }),
     }),

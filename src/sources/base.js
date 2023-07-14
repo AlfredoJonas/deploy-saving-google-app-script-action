@@ -60,6 +60,20 @@ class BaseSource {
   }
 
   /**
+   * Check if the amount of money to be saved it's higher than the one plan in the budget
+   * If yes a warning message is sent to remind the current budget and that you are lower/higher
+   * than the one set
+   */
+  checkBudget(montoDolares, category) {
+    const budgetSheet = SpreadsheetApp.openById(SETTINGS.getProperty('ssId')).getSheetByName('Presupuesto');
+    budgetSheet.getRange('A3').setValue(category);
+    const budgetDolares = parseFloat(budgetSheet.getRange('B3').getValue());
+    if (budgetDolares > 0 && budgetDolares < montoDolares) {
+      this.sendMessage("WARNING: El monto ingresado supera el presupuesto de " + budgetDolares + "$");
+    }
+  }
+
+  /**
    * Check the text send from the source and proccess it 
    * to save a new expense record on the Google Sheet
    */
@@ -70,48 +84,65 @@ class BaseSource {
       const nowDate = new Date();
       const date = formatDate(nowDate);
       const item = this.text.split(' - ');
-      const monto = parseFloat(item[2]).toFixed(2);
-      const currencyData = this.getCurrencyInfo();
-      const rates = currencyData['rates'];
-      const eurUsd = parseFloat(rates['USD']);
-      const eurVes = parseFloat(rates['VES']);
-      const bsUsd = parseFloat(rates['VES'])/eurUsd;
-      const pesoUsd = parseFloat(rates['COP'])/eurUsd;
-      const pesoBs = parseFloat(rates['COP'])/eurVes;
-      let pesos = null;
-      let dolar = null;
-      let bolivar = null;
-      let message = null;
+      const monto = parseFloat(item[2]);
 
-      // Calculate all the currences to keep a history record
-      if (item[1] == 'Bolivar') {
-        pesos = parseFloat(monto * pesoBs).toFixed(2);
-        dolar = parseFloat(monto / bsUsd).toFixed(2);
-        bolivar = monto;
-      } else if (item[1] == 'Dolar') {
-        pesos = parseFloat(monto * pesoUsd).toFixed(2);
-        dolar = monto;
-        bolivar = parseFloat(monto * bsUsd).toFixed(2);
-      } else if (item[1] == 'Peso') {
-        pesos = monto;
-        dolar = parseFloat(monto / pesoUsd).toFixed(2);
-        bolivar = parseFloat(monto / pesoBs).toFixed(2);
-      }
+      const {
+        pesos,
+        dolares,
+        bolivares,
+        bsUsd,
+        pesoBs,
+        pesoUsd,
+      } = this.checkCurrencyValues(monto, item[1]);
 
       // Check if the calculations went well
-      if (pesos != null && dolar != null && bolivar != null && item.length == 4) {
-        expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
-        message = "Gasto guardado exitosamente. Tipo de cambios: BS/USD=" + bsUsd.toFixed(2) + " COP/BS=" + pesoBs.toFixed(2) + " COP/USD=" + pesoUsd.toFixed(2);
-        this.sendMessage(message);
-        return {success: true, message};
+      if (pesos != null && dolares != null && bolivares != null && item.length == 4) {
+        expenseSheet.appendRow([date, item[0], item[1], bolivares, pesos, dolares, item[3]]);
+        const message = "Gasto guardado exitosamente!";
+        const expenseAdded = "\n  GASTO: fecha=" + date + " | Categoria=" + item[0] + " | dolares=" + dolares + ", pesos=" + pesos + ", bolivares=" + bolivares;
+        const exchangeRates = "\n  Tasas de cambios: BS/USD=" + bsUsd.toFixed(2) + " | COP/BS=" + pesoBs.toFixed(2) + " | COP/USD=" + pesoUsd.toFixed(2)
+        this.sendMessage(message + expenseAdded + exchangeRates);
+        this.checkBudget(dolares, item[1]);
       } else {
         throw new Error("ERROR: Verifique el formato del mensaje.");
       }
       
     } catch (error) {
-      console.log(error);
       this.sendMessage(error.message);
     }
+  }
+
+  /**
+   * Check and calculate the amount of money to be saved based on the exchange rates
+   * taken from the exchangeratesapi.io API
+   */
+  checkCurrencyValues(monto, currency) {
+    const currencyData = this.getCurrencyInfo();
+    const rates = currencyData['rates'];
+    const eurUsd = parseFloat(rates['USD']);
+    const eurVes = parseFloat(rates['VES']);
+    const bsUsd = parseFloat(rates['VES'])/eurUsd;
+    const pesoUsd = parseFloat(rates['COP'])/eurUsd;
+    const pesoBs = parseFloat(rates['COP'])/eurVes;
+    let pesos = null;
+    let dolares = null;
+    let bolivares = null;
+
+    // Calculate all the currences to keep a history record
+    if (currency == 'Bolivar') {
+      pesos = parseFloat(monto * pesoBs).toFixed(2);
+      dolares = parseFloat(monto / bsUsd).toFixed(2);
+      bolivares = monto;
+    } else if (currency == 'Dolar') {
+      pesos = parseFloat(monto * pesoUsd).toFixed(2);
+      dolares = monto;
+      bolivares = parseFloat(monto * bsUsd).toFixed(2);
+    } else if (currency == 'Peso') {
+      pesos = monto;
+      dolares = parseFloat(monto / pesoUsd).toFixed(2);
+      bolivares = parseFloat(monto / pesoBs).toFixed(2);
+    }
+    return {pesos, dolares, bolivares, bsUsd, pesoBs, pesoUsd};
   }
 
   /**
@@ -219,7 +250,6 @@ class BaseSource {
         this.cleanReportCells(otrosSheet);
       }
     } catch (error) {
-      console.log(error);
       this.sendMessage(error.message);
     }
   }
