@@ -18,7 +18,7 @@ class TelegramBot extends BaseSource {
     try {
       UrlFetchApp.fetch(this.telegramUrl + '&text=' + text);
     } catch (error) {
-      console.log(error.message + ' | ' + "ERROR: Fallo al enviar el mensaje: " + text);
+      console.log(error.message + ' | ' + "ERROR: Fallo al enviar el mensaje: " + encodeURI(text));
     }
   }
 }
