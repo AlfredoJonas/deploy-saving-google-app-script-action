@@ -57,7 +57,11 @@ class BaseSource {
     }
   }
 
-
+  /**
+   * Check if the amount of money to be saved it's higher than the one plan in the budget
+   * If yes a warning message is sent to remind the current budget and that you are lower/higher
+   * than the one set
+   */
   checkBudget(montoDolares, category) {
     const budgetSheet = SpreadsheetApp.openById(SETTINGS.getProperty('ssId')).getSheetByName('Presupuesto');
     budgetSheet.getRange('A3').setValue(category);
@@ -105,6 +109,10 @@ class BaseSource {
     }
   }
 
+  /**
+   * Check and calculate the amount of money to be saved based on the exchange rates
+   * taken from the exchangeratesapi.io API
+   */
   checkCurrencyValues(monto, currency) {
     const currencyData = this.getCurrencyInfo();
     const bsUsd = parseFloat(currencyData['USD']['promedio']);
