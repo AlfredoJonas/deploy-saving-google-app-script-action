@@ -1,11 +1,29 @@
 import jest from "jest-mock";
 import MockedBaseSource from "./mocks";
 
-test('Process an expensive record with a good format', () => {
+test('Process an expensive record with a good format and budget', () => {
     const telegramBot = new MockedBaseSource("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino");
     telegramBot.sendMessage = jest.fn();
     telegramBot.proccessExpenseMessage();
-	expect(telegramBot.sendMessage).toBeCalledWith("Gasto guardado exitosamente. Tipo de cambios: Bs/USD=24.95 Bs/COP=174 USD/COP=4640");
+	expect(telegramBot.sendMessage).toHaveBeenCalledTimes(1);
+    const message = "Gasto guardado exitosamente!";
+    const expenseAdded = "\n  GASTO: fecha=2023/7/14 | Categoria=Conocimiento | dolares=12.93, pesos=60000, bolivares=344.83";
+    const exchangeRates = "\n  Tasas de cambios: Bs/USD=24.95 | Bs/COP=174 | USD/COP=4640";
+	expect(telegramBot.sendMessage).toHaveBeenCalledWith(message + expenseAdded + exchangeRates);
+});
+
+
+test('Process an expensive record with a good format and higher amount than budget', () => {
+    const telegramBot = new MockedBaseSource("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino");
+    telegramBot.sendMessage = jest.fn();
+    let budget = 0;
+    global.SpreadsheetApp.constants.budget = budget = 12.5;
+    telegramBot.proccessExpenseMessage();
+    const message = "Gasto guardado exitosamente!";
+    const expenseAdded = "\n  GASTO: fecha=2023/7/14 | Categoria=Conocimiento | dolares=12.93, pesos=60000, bolivares=344.83";
+    const exchangeRates = "\n  Tasas de cambios: Bs/USD=24.95 | Bs/COP=174 | USD/COP=4640";
+	expect(telegramBot.sendMessage).toHaveBeenNthCalledWith(1, message + expenseAdded + exchangeRates);
+	expect(telegramBot.sendMessage).toHaveBeenNthCalledWith(2, `WARNING: El monto ingresado supera el presupuesto de ${budget}$`);
 });
 
 test('Process an expensive record with wrong text format', () => {

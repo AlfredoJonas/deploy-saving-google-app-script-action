@@ -57,6 +57,16 @@ class BaseSource {
     }
   }
 
+
+  checkBudget(montoDolares, category) {
+    const budgetSheet = SpreadsheetApp.openById(SETTINGS.getProperty('ssId')).getSheetByName('Presupuesto');
+    budgetSheet.getRange('A3').setValue(category);
+    const budgetDolares = parseFloat(budgetSheet.getRange('B3').getValue());
+    if (budgetDolares > 0 && budgetDolares < montoDolares) {
+      this.sendMessage("WARNING: El monto ingresado supera el presupuesto de " + budgetDolares + "$");
+    }
+  }
+
   /**
    * Check the text send from the source and proccess it 
    * to save a new expense record on the Google Sheet
@@ -69,43 +79,56 @@ class BaseSource {
       const date = formatDate(nowDate);
       const item = this.text.split(' - ');
       const monto = parseFloat(item[2]);
-      const currencyData = this.getCurrencyInfo();
-      const bsUsd = parseFloat(currencyData['USD']['promedio']);
-      const bsPesos = parseFloat(currencyData['COL']['compra']);
-      const usdPesos = parseFloat(currencyData['USDCOL']['ratetrm']);
-      let pesos = null;
-      let dolar = null;
-      let bolivar = null;
-      let message = null;
 
-      // Calculate all the currences to keep a history record
-      if (item[1] == 'Bolivar') {
-        pesos = parseFloat(monto * bsPesos);
-        dolar = parseFloat(monto / bsUsd);
-        bolivar = monto;
-      } else if (item[1] == 'Dolar') {
-        pesos = parseFloat(monto * usdPesos);
-        dolar = monto;
-        bolivar = parseFloat(monto * bsUsd);
-      } else if (item[1] == 'Peso') {
-        pesos = monto;
-        dolar = parseFloat(monto / usdPesos);
-        bolivar = parseFloat(monto / bsPesos);
-      }
+      const {
+        pesos,
+        dolares,
+        bolivares,
+        bsUsd,
+        bsPesos,
+        usdPesos
+      } = this.checkCurrencyValues(monto, item[1]);
 
       // Check if the calculations went well
-      if (pesos != null && dolar != null && bolivar != null && item.length == 4) {
-        expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
-        message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
-        this.sendMessage(message);
-        return {success: true, message};
+      if (pesos != null && dolares != null && bolivares != null && item.length == 4) {
+        expenseSheet.appendRow([date, item[0], item[1], bolivares, pesos, dolares, item[3]]);
+        const message = "Gasto guardado exitosamente!";
+        const expenseAdded = "\n  GASTO: fecha=" + date + " | Categoria=" + item[0] + " | dolares=" + dolares + ", pesos=" + pesos + ", bolivares=" + bolivares;
+        const exchangeRates = "\n  Tasas de cambios: Bs/USD=" + bsUsd + " | Bs/COP=" + bsPesos + " | USD/COP=" + usdPesos
+        this.sendMessage(message + expenseAdded + exchangeRates);
+        this.checkBudget(dolares, item[1]);
       } else {
         throw new Error("ERROR: Verifique el formato del mensaje.");
       }
     } catch (error) {
-      console.log(error);
       this.sendMessage(error.message);
     }
+  }
+
+  checkCurrencyValues(monto, currency) {
+    const currencyData = this.getCurrencyInfo();
+    const bsUsd = parseFloat(currencyData['USD']['promedio']);
+    const bsPesos = parseFloat(currencyData['COL']['compra']);
+    const usdPesos = parseFloat(currencyData['USDCOL']['ratetrm']);
+    let pesos = null;
+    let dolares = null;
+    let bolivares = null;
+
+    // Calculate all the currences to keep a history record
+    if (currency == 'Bolivar') {
+      pesos = parseFloat(monto * bsPesos).toFixed(2);
+      dolares = parseFloat(monto / bsUsd).toFixed(2);
+      bolivares = monto;
+    } else if (currency == 'Dolar') {
+      pesos = parseFloat(monto * usdPesos).toFixed(2);
+      dolares = monto;
+      bolivares = parseFloat(monto * bsUsd).toFixed(2);
+    } else if (currency == 'Peso') {
+      pesos = monto;
+      dolares = parseFloat(monto / usdPesos).toFixed(2);
+      bolivares = parseFloat(monto / bsPesos).toFixed(2);
+    }
+    return {pesos, dolares, bolivares, bsUsd, bsPesos, usdPesos};
   }
 
   /**
@@ -213,7 +236,6 @@ class BaseSource {
         this.cleanReportCells(otrosSheet);
       }
     } catch (error) {
-      console.log(error);
       this.sendMessage(error.message);
     }
   }
