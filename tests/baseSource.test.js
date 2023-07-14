@@ -17,7 +17,7 @@ test('Process an expensive record with a good format and higher amount than budg
     const telegramBot = new MockedBaseSource("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino");
     telegramBot.sendMessage = jest.fn();
     let finalBudgetReport = 0;
-    global.SpreadsheetApp.constants.finalBudgetReport = finalBudgetReport = 14;
+    global.SpreadsheetApp.constants.finalBudgetReport = finalBudgetReport = 25;
     telegramBot.proccessExpenseMessage();
     const message = "Gasto guardado exitosamente!";
     const expenseAdded = "\n\nGASTO: fecha=2023/7/14 | Categoria=Conocimiento";
