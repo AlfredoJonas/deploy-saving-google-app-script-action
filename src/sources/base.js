@@ -103,7 +103,7 @@ class BaseSource {
         const expenseAdded = "GASTO: fecha=" + date + " | Categoria=" + item[0] + " | dolares=" + dolares + ", pesos=" + pesos + ", bolivares=" + bolivares;
         const exchangeRates = "Tasas de cambios: BS/USD=" + bsUsd.toFixed(2) + " | COP/BS=" + pesoBs.toFixed(2) + " | COP/USD=" + pesoUsd.toFixed(2);
         const budgetMessage = this.checkBudget(dolares, item[0]);
-        this.sendMessage(message);
+        this.sendMessage(message + expenseAdded + exchangeRates + budgetMessage);
       } else {
         throw new Error("ERROR: Verifique el formato del mensaje.");
       }
