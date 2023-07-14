@@ -69,8 +69,9 @@ class BaseSource {
     budgetSheet.getRange('A3').setValue(category);
     const budgetDolares = parseFloat(budgetSheet.getRange('B3').getValue());
     if (budgetDolares > 0 && budgetDolares < montoDolares) {
-      this.sendMessage("WARNING: El monto ingresado supera el presupuesto de " + budgetDolares + "$");
+      return "WARNING: El monto ingresado supera el presupuesto de " + budgetDolares + "$";
     }
+    return "";
   }
 
   /**
@@ -101,8 +102,8 @@ class BaseSource {
         const message = "Gasto guardado exitosamente!";
         const expenseAdded = "GASTO: fecha=" + date + " | Categoria=" + item[0] + " | dolares=" + dolares + ", pesos=" + pesos + ", bolivares=" + bolivares;
         const exchangeRates = "Tasas de cambios: BS/USD=" + bsUsd.toFixed(2) + " | COP/BS=" + pesoBs.toFixed(2) + " | COP/USD=" + pesoUsd.toFixed(2);
-        this.sendMessage(message + expenseAdded + exchangeRates);
-        this.checkBudget(dolares, item[0]);
+        const budgetMessage = this.checkBudget(dolares, item[0]);
+        this.sendMessage(message + expenseAdded + exchangeRates + budgetMessage);
       } else {
         throw new Error("ERROR: Verifique el formato del mensaje.");
       }
