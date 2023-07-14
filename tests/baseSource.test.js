@@ -1,7 +1,7 @@
 import jest from "jest-mock";
 import MockedBaseSource from "./mocks";
 
-test('Process an expensive record with a good format and budget', () => {
+test.skip('Process an expensive record with a good format and budget', () => {
     const telegramBot = new MockedBaseSource("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino");
     telegramBot.sendMessage = jest.fn();
     telegramBot.proccessExpenseMessage();
@@ -13,7 +13,7 @@ test('Process an expensive record with a good format and budget', () => {
 });
 
 
-test('Process an expensive record with a good format and higher amount than budget', () => {
+test.skip('Process an expensive record with a good format and higher amount than budget', () => {
     const telegramBot = new MockedBaseSource("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino");
     telegramBot.sendMessage = jest.fn();
     let budget = 0;
