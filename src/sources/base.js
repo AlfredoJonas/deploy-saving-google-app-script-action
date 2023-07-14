@@ -66,11 +66,20 @@ class BaseSource {
    */
   checkBudget(montoDolares, category) {
     const budgetSheet = SpreadsheetApp.openById(SETTINGS.getProperty('ssId')).getSheetByName('Presupuesto');
+    const currentDate = new Date().toLocaleDateString('en-GB');
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    this.otrosSheet.getRange('G3').setValue(firstDayOfMonth);
+    this.otrosSheet.getRange('H3').setValue(currentDate);
+    this.otrosSheet.getRange('I3').setValue(category);
+    const dolarReportValue = parseFloat(this.otrosSheet.getRange('M3').getValue()) + parseFloat(montoDolares);
     budgetSheet.getRange('A3').setValue(category);
     const budgetDolares = parseFloat(budgetSheet.getRange('B3').getValue());
-    if (budgetDolares > 0 && montoDolares > budgetDolares) {
-      return "\n\n WARNING: El monto ingresado supera el presupuesto de " + budgetDolares + "$";
+    if (budgetDolares > 0 && dolarReportValue > budgetDolares) {
+      return "\n\n WARNING: Los gastos para la categoria " + category + " superan el presupuesto(" + budgetDolares + "$)" + " del presente mes.";
     }
+    this.cleanReportCells(this.otrosSheet);
     return "";
   }
 
@@ -100,7 +109,7 @@ class BaseSource {
       if (pesos != null && dolares != null && bolivares != null && item.length == 4) {
         expenseSheet.appendRow([date, item[0], item[1], bolivares, pesos, dolares, item[3]]);
         const message = "Gasto guardado exitosamente!";
-        const expenseAdded = "\n\nGASTO: fecha=" + date + " | Categoria=" + item[0] + " \n     dolares=" + dolares + ", pesos=" + pesos + ", bolivares=" + bolivares;
+        const expenseAdded = "\n\nGASTO: fecha=" + date + " | Categoria=" + item[0] + "\n     dolares=" + dolares + ", pesos=" + pesos + ", bolivares=" + bolivares;
         const exchangeRates = "\nTasas de cambios: BS/USD=" + bsUsd.toFixed(2) + " | COP/BS=" + pesoBs.toFixed(2) + " | COP/USD=" + pesoUsd.toFixed(2);
         const budgetMessage = this.checkBudget(dolares, item[0]);
         this.sendMessage(message + expenseAdded + exchangeRates + budgetMessage);

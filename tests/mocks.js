@@ -2,7 +2,8 @@ import BaseSource from "../src/sources/base";
 
 global.SpreadsheetApp = {
     constants: {
-        budget: 15.5,
+        budget: 20,
+        finalBudgetReport: 0.2
     },
     openById: () => ({
         getSheetByName: () => ({
@@ -17,6 +18,8 @@ global.SpreadsheetApp = {
                     case "B3":
                         returnValues.getValue = () => global.SpreadsheetApp.constants.budget;
                         return returnValues;
+                    case "M3":
+                        returnValues.getValue = () => global.SpreadsheetApp.constants.finalBudgetReport;
                     default:
                         return returnValues;
                 }
