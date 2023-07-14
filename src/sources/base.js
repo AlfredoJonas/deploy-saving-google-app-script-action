@@ -78,6 +78,7 @@ class BaseSource {
     if (budgetDolares > 0 && dolarReportValue > budgetDolares) {
       return "\n\nWARNING: Los gastos para la categoria " + category + " superan el presupuesto(" + budgetDolares + "$)" + " del presente mes.";
     }
+    this.cleanReport();
     return "";
   }
 
