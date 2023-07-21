@@ -1,11 +1,31 @@
 import jest from "jest-mock";
 import MockedBaseSource from "./mocks";
+import formatDate from "../src/utils";
 
-test('Process an expensive record with a good format', () => {
+test('Process an expensive record with a good format and budget', () => {
     const telegramBot = new MockedBaseSource("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino");
     telegramBot.sendMessage = jest.fn();
     telegramBot.proccessExpenseMessage();
-	expect(telegramBot.sendMessage).toBeCalledWith("Gasto guardado exitosamente. Tipo de cambios: Bs/USD=24.95 Bs/COP=174 USD/COP=4640");
+    const message = "Gasto guardado exitosamente!";
+    const expenseAdded = `\n\nGASTO: fecha=${formatDate(new Date())} | Categoria=Conocimiento`;
+    const ratesMessage = "\n     dolares=14.31, pesos=60000, bolivares=403.25";
+    const exchangeRates = "\nTasas de cambios: \n     BS/USD=28.17 | COP/BS=148.79 | COP/USD=4191.66";
+	expect(telegramBot.sendMessage).toHaveBeenCalledWith(message + expenseAdded + ratesMessage + exchangeRates);
+});
+
+
+test('Process an expensive record with a good format and higher amount than budget', () => {
+    const telegramBot = new MockedBaseSource("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino");
+    telegramBot.sendMessage = jest.fn();
+    let finalBudgetReport = 0;
+    global.SpreadsheetApp.constants.finalBudgetReport = finalBudgetReport = 25;
+    telegramBot.proccessExpenseMessage();
+    const message = "Gasto guardado exitosamente!";
+    const expenseAdded = `\n\nGASTO: fecha=${formatDate(new Date())} | Categoria=Conocimiento`;
+    const ratesMessage = "\n     dolares=14.31, pesos=60000, bolivares=403.25";
+    const exchangeRates = "\nTasas de cambios: \n     BS/USD=28.17 | COP/BS=148.79 | COP/USD=4191.66";
+	const budgetReport = "\n\n PILAS: Los gastos para la categoria Conocimiento superan el presupuesto(20$) del presente mes.";
+    expect(telegramBot.sendMessage).toHaveBeenCalledWith(message + expenseAdded + ratesMessage + exchangeRates + budgetReport);
 });
 
 test('Process an expensive record with wrong text format', () => {
