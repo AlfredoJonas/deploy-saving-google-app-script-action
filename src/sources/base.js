@@ -79,7 +79,7 @@ class BaseSource {
     if (budgetDolares > 0 && dolarReportValue > budgetDolares) {
       return "\n\n PILAS: Los gastos para la categoria " + category + " superan el presupuesto(" + budgetDolares + "$)" + " del presente mes.";
     }
-    this.cleanReportCells(this.otrosSheet);
+    this.cleanReportCells();
     return "";
   }
 
@@ -235,7 +235,7 @@ class BaseSource {
       // and start asking for next cell to be filled out
       if (this.text == '/reporte') {
         const statusReporte = this.otrosSheet.getRange('F3');
-        this.cleanReportCells(this.otrosSheet);
+        this.cleanReportCells();
         statusReporte.setValue('VERDADERO');
         message = "El reporte ah iniciado...";
         this.sendMessage(message);
@@ -257,7 +257,7 @@ class BaseSource {
         this.sendMessage(message);
 
         // and clean the cells for a next report
-        this.cleanReportCells(otrosSheet);
+        this.cleanReportCells();
       }
     } catch (error) {
       this.sendMessage(error.message);
@@ -277,7 +277,7 @@ class BaseSource {
   cleanReport() {
     const statusReporte = this.otrosSheet.getRange('F3');
     if (statusReporte.getValue() == 'VERDADERO') {
-      this.cleanReportCells(this.otrosSheet);
+      this.cleanReportCells();
       this.sendMessage("El reporte ah finalizado brother!");
     }
   }
