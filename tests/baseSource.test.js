@@ -1,16 +1,18 @@
 import jest from "jest-mock";
 import MockedBaseSource from "./mocks";
-import formatDate from "../src/utils";
+
+const message = "Gasto guardado exitosamente!";
+const expenseAdded = `\n\nCategoria=Conocimiento`;
+const ratesMessage = "\n      Dolares: 14.31\n      Pesos: 60000\n      Bolivares: 403.25";
+const exchangeRates = "\nTasas de cambios:\n      BS/USD: 28.17\n      COP/BS: 148.79\n      COP/USD: 4191.66";
+const budgetReport = "\n\n PILAS: Los gastos para la categoria Conocimiento superan el presupuesto(20$) del presente mes.";
+
 
 test('Process an expensive record with a good format and budget', () => {
     const telegramBot = new MockedBaseSource("Conocimiento - Peso - 60000 - Inscripción ídem y Jonás curso canino");
     telegramBot.sendMessage = jest.fn();
     telegramBot.proccessExpenseMessage();
-    const message = "Gasto guardado exitosamente!";
-    const expenseAdded = `\n\nGASTO: fecha=${formatDate(new Date())} | Categoria=Conocimiento`;
-    const ratesMessage = "\n     dolares=14.31, pesos=60000, bolivares=403.25";
-    const exchangeRates = "\nTasas de cambios: \n     BS/USD=28.17 | COP/BS=148.79 | COP/USD=4191.66";
-	expect(telegramBot.sendMessage).toHaveBeenCalledWith(message + expenseAdded + ratesMessage + exchangeRates);
+    expect(telegramBot.sendMessage).toHaveBeenCalledWith(message + expenseAdded + ratesMessage + exchangeRates);
 });
 
 
@@ -20,11 +22,6 @@ test('Process an expensive record with a good format and higher amount than budg
     let finalBudgetReport = 0;
     global.SpreadsheetApp.constants.finalBudgetReport = finalBudgetReport = 25;
     telegramBot.proccessExpenseMessage();
-    const message = "Gasto guardado exitosamente!";
-    const expenseAdded = `\n\nGASTO: fecha=${formatDate(new Date())} | Categoria=Conocimiento`;
-    const ratesMessage = "\n     dolares=14.31, pesos=60000, bolivares=403.25";
-    const exchangeRates = "\nTasas de cambios: \n     BS/USD=28.17 | COP/BS=148.79 | COP/USD=4191.66";
-	const budgetReport = "\n\n PILAS: Los gastos para la categoria Conocimiento superan el presupuesto(20$) del presente mes.";
     expect(telegramBot.sendMessage).toHaveBeenCalledWith(message + expenseAdded + ratesMessage + exchangeRates + budgetReport);
 });
 
