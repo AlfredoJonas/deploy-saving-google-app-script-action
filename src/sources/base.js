@@ -49,8 +49,10 @@ class BaseSource {
    * being stored from the dolartoday.com web page
    */
   getCurrencyInfo() {
+    const access_key = SETTINGS.getProperty('exchangeratesapiAccessKey');
+    const exchangeUrl = `${SETTINGS.getProperty('exchangeUrl')}/latest?access_key=${access_key}&symbols =COP,VES,USD`;
     try {
-      const response = UrlFetchApp.fetch(SETTINGS.getProperty('exchangeUrl'));
+      const response = UrlFetchApp.fetch(exchangeUrl);
       return JSON.parse(response.getContentText());
     } catch (error) {
       throw new Error("ERROR: Fallo al obtener la informacion de las tasas de cambio.");
@@ -64,7 +66,6 @@ class BaseSource {
    */
   checkBudget(montoDolares, category) {
     const budgetSheet = SpreadsheetApp.openById(SETTINGS.getProperty('ssId')).getSheetByName('Presupuesto');
-
     const currentDate = new Date().toLocaleDateString('en-GB');
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -76,9 +77,9 @@ class BaseSource {
     budgetSheet.getRange('A3').setValue(category);
     const budgetDolares = parseFloat(budgetSheet.getRange('B3').getValue());
     if (budgetDolares > 0 && dolarReportValue > budgetDolares) {
-      return "\n\nWARNING: Los gastos para la categoria " + category + " superan el presupuesto(" + budgetDolares + "$)" + " del presente mes.";
+      return "\n\n PILAS: Los gastos para la categoria " + category + " superan el presupuesto(" + budgetDolares + "$)" + " del presente mes.";
     }
-    this.cleanReport();
+    this.cleanReportCells(this.otrosSheet);
     return "";
   }
 
@@ -100,21 +101,22 @@ class BaseSource {
         dolares,
         bolivares,
         bsUsd,
-        bsPesos,
-        usdPesos
+        pesoBs,
+        pesoUsd,
       } = this.checkCurrencyValues(monto, item[1]);
 
       // Check if the calculations went well
       if (pesos != null && dolares != null && bolivares != null && item.length == 4) {
         expenseSheet.appendRow([date, item[0], item[1], bolivares, pesos, dolares, item[3]]);
         const message = "Gasto guardado exitosamente!";
-        const expenseAdded = "\nGASTO: fecha=" + date + " | Categoria=" + item[0] + " | dolares=" + dolares + ", pesos=" + pesos + ", bolivares=" + bolivares;
-        const exchangeRates = "\nTasas de cambios: Bs/USD=" + bsUsd + " | Bs/COP=" + bsPesos + " | USD/COP=" + usdPesos;
+        const expenseAdded = "\n\nGASTO: fecha=" + date + " | Categoria=" + item[0] + "\n     dolares=" + dolares + ", pesos=" + pesos + ", bolivares=" + bolivares;
+        const exchangeRates = "\nTasas de cambios: \n     BS/USD=" + bsUsd.toFixed(2) + " | COP/BS=" + pesoBs.toFixed(2) + " | COP/USD=" + pesoUsd.toFixed(2);
         const budgetMessage = this.checkBudget(dolares, item[0]);
         this.sendMessage(message + expenseAdded + exchangeRates + budgetMessage);
       } else {
         throw new Error("ERROR: Verifique el formato del mensaje.");
       }
+      
     } catch (error) {
       this.sendMessage(error.message);
     }
@@ -126,28 +128,31 @@ class BaseSource {
    */
   checkCurrencyValues(monto, currency) {
     const currencyData = this.getCurrencyInfo();
-    const bsUsd = parseFloat(currencyData['USD']['promedio']);
-    const bsPesos = parseFloat(currencyData['COL']['compra']);
-    const usdPesos = parseFloat(currencyData['USDCOL']['ratetrm']);
+    const rates = currencyData['rates'];
+    const eurUsd = parseFloat(rates['USD']);
+    const eurVes = parseFloat(rates['VES']);
+    const bsUsd = parseFloat(rates['VES'])/eurUsd;
+    const pesoUsd = parseFloat(rates['COP'])/eurUsd;
+    const pesoBs = parseFloat(rates['COP'])/eurVes;
     let pesos = null;
     let dolares = null;
     let bolivares = null;
 
     // Calculate all the currences to keep a history record
     if (currency == 'Bolivar') {
-      pesos = parseFloat(monto * bsPesos).toFixed(2);
+      pesos = parseFloat(monto * pesoBs).toFixed(2);
       dolares = parseFloat(monto / bsUsd).toFixed(2);
       bolivares = monto;
     } else if (currency == 'Dolar') {
-      pesos = parseFloat(monto * usdPesos).toFixed(2);
+      pesos = parseFloat(monto * pesoUsd).toFixed(2);
       dolares = monto;
       bolivares = parseFloat(monto * bsUsd).toFixed(2);
     } else if (currency == 'Peso') {
       pesos = monto;
-      dolares = parseFloat(monto / usdPesos).toFixed(2);
-      bolivares = parseFloat(monto / bsPesos).toFixed(2);
+      dolares = parseFloat(monto / pesoUsd).toFixed(2);
+      bolivares = parseFloat(monto / pesoBs).toFixed(2);
     }
-    return {pesos, dolares, bolivares, bsUsd, bsPesos, usdPesos};
+    return {pesos, dolares, bolivares, bsUsd, pesoBs, pesoUsd};
   }
 
   /**

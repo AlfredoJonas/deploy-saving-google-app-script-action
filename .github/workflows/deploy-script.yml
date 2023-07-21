@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{github.event_name	!= 'schedule' && success()}}
+    if: ${{github.event_name	!= 'schedule'}} && success()
     steps:
       - name: Install clasp
         id: install-clasp-and-dependencies

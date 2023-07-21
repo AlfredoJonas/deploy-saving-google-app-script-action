@@ -2,7 +2,7 @@ import BaseSource from "../src/sources/base";
 
 global.SpreadsheetApp = {
     constants: {
-        budget: 13.5,
+        budget: 20,
         finalBudgetReport: 0.2
     },
     openById: () => ({
@@ -44,7 +44,7 @@ global.SETTINGS = {
 
 global.UrlFetchApp = {
     fetch: () => ({
-        getContentText: () => '{"USD": {"promedio": 24.95},"COL": {"compra": 174},"USDCOL": {"ratetrm": 4640}}',
+        getContentText: () => '{"success":true,"timestamp":1689097383,"base":"EUR","date":"2023-07-11","rates":{"COP":4613.878404,"USD":1.100728,"VES":31.009038}}',
     }),
 };
 
