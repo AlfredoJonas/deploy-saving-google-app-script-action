@@ -2,7 +2,7 @@ import jest from "jest-mock";
 import MockedBaseSource from "./mocks";
 
 const message = "Gasto guardado exitosamente!";
-const expenseAdded = `\n\nCategoria=Conocimiento`;
+const expenseAdded = `\n\nCategoria Conocimiento:`;
 const ratesMessage = "\n      Dolares: 14.31\n      Pesos: 60000\n      Bolivares: 403.25";
 const exchangeRates = "\nTasas de cambios:\n      BS/USD: 28.17\n      COP/BS: 148.79\n      COP/USD: 4191.66";
 const budgetReport = "\n\n PILAS: Los gastos para la categoria Conocimiento superan el presupuesto(20$) del presente mes.";

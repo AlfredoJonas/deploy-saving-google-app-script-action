@@ -109,7 +109,7 @@ class BaseSource {
       if (pesos != null && dolares != null && bolivares != null && item.length == 4) {
         expenseSheet.appendRow([date, item[0], item[1], bolivares, pesos, dolares, item[3]]);
         const message = "Gasto guardado exitosamente!";
-        const expenseAdded = "\n\nCategoria=" + item[0] + "\n      Dolares: " + dolares + "\n      Pesos: " + pesos + "\n      Bolivares: " + bolivares;
+        const expenseAdded = "\n\nCategoria " + item[0] + ":\n      Dolares: " + dolares + "\n      Pesos: " + pesos + "\n      Bolivares: " + bolivares;
         const exchangeRates = "\nTasas de cambios:\n      BS/USD: " + bsUsd.toFixed(2) + "\n      COP/BS: " + pesoBs.toFixed(2) + "\n      COP/USD: " + pesoUsd.toFixed(2);
         const budgetMessage = this.checkBudget(dolares, item[0]);
         this.sendMessage(message + expenseAdded + exchangeRates + budgetMessage);
