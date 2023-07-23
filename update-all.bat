@@ -17,3 +17,7 @@ git push origin angelica-gonzalez
 git checkout maldonado-perez
 git merge main
 git push origin maldonado-perez
+
+git checkout josue-nino
+git merge main
+git push origin josue-nino

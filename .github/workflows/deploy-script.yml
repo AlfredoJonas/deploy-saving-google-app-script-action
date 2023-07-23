@@ -2,7 +2,7 @@ name: Deploy Script
 on:
   workflow_dispatch:
   push:
-    branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez, maldonado-perez]
+    branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez, maldonado-perez, josue-nino]
   release:
     types: [published]
 
@@ -10,7 +10,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{github.event_name	!= 'schedule'}} && success()
-    environment: Jonas Gonzalez
+    environment: Josue Nino
     steps:
       - name: Install clasp
         id: install-clasp-and-dependencies
