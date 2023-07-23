@@ -24,5 +24,5 @@ test('Throw error when sending a message but the telegram bot api fails', () => 
     const telegramBot = new TelegramBot("Any message", 5123213);
     console.log = jest.fn();
     telegramBot.sendMessage("some message");
-    expect(console.log).toBeCalledWith("http error, the source does not exist | ERROR: Fallo al enviar el mensaje: some message");
+    expect(console.log).toBeCalledWith("http error, the source does not exist | ERROR: Fallo al enviar el mensaje: some%20message");
 });

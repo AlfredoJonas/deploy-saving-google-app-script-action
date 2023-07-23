@@ -49,12 +49,38 @@ class BaseSource {
    * being stored from the dolartoday.com web page
    */
   getCurrencyInfo() {
+    const access_key = SETTINGS.getProperty('exchangeratesapiAccessKey');
+    const exchangeUrl = `${SETTINGS.getProperty('exchangeUrl')}/latest?access_key=${access_key}&symbols =COP,VES,USD`;
     try {
-      const response = UrlFetchApp.fetch(SETTINGS.getProperty('exchangeUrl'));
+      const response = UrlFetchApp.fetch(exchangeUrl);
       return JSON.parse(response.getContentText());
     } catch (error) {
       throw new Error("ERROR: Fallo al obtener la informacion de las tasas de cambio.");
     }
+  }
+
+  /**
+   * Check if the amount of money to be saved it's higher than the one plan in the budget
+   * If yes a warning message is sent to remind the current budget and that you are lower/higher
+   * than the one set
+   */
+  checkBudget(montoDolares, category) {
+    const budgetSheet = SpreadsheetApp.openById(SETTINGS.getProperty('ssId')).getSheetByName('Presupuesto');
+    const currentDate = new Date().toLocaleDateString('en-GB');
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    this.otrosSheet.getRange('G3').setValue(firstDayOfMonth);
+    this.otrosSheet.getRange('H3').setValue(currentDate);
+    this.otrosSheet.getRange('I3').setValue(category);
+    const dolarReportValue = parseFloat(this.otrosSheet.getRange('M3').getValue());
+    budgetSheet.getRange('A3').setValue(category);
+    const budgetDolares = parseFloat(budgetSheet.getRange('B3').getValue());
+    if (budgetDolares > 0 && dolarReportValue > budgetDolares) {
+      return "\n\n PILAS: Los gastos para la categoria " + category + " superan el presupuesto(" + budgetDolares + "$)" + " del presente mes.";
+    }
+    this.cleanReportCells();
+    return "";
   }
 
   /**
@@ -69,43 +95,64 @@ class BaseSource {
       const date = formatDate(nowDate);
       const item = this.text.split(' - ');
       const monto = parseFloat(item[2]);
-      const currencyData = this.getCurrencyInfo();
-      const bsUsd = parseFloat(currencyData['USD']['promedio']);
-      const bsPesos = parseFloat(currencyData['COL']['compra']);
-      const usdPesos = parseFloat(currencyData['USDCOL']['ratetrm']);
-      let pesos = null;
-      let dolar = null;
-      let bolivar = null;
-      let message = null;
 
-      // Calculate all the currences to keep a history record
-      if (item[1] == 'Bolivar') {
-        pesos = parseFloat(monto * bsPesos);
-        dolar = parseFloat(monto / bsUsd);
-        bolivar = monto;
-      } else if (item[1] == 'Dolar') {
-        pesos = parseFloat(monto * usdPesos);
-        dolar = monto;
-        bolivar = parseFloat(monto * bsUsd);
-      } else if (item[1] == 'Peso') {
-        pesos = monto;
-        dolar = parseFloat(monto / usdPesos);
-        bolivar = parseFloat(monto / bsPesos);
-      }
+      const {
+        pesos,
+        dolares,
+        bolivares,
+        bsUsd,
+        pesoBs,
+        pesoUsd,
+      } = this.checkCurrencyValues(monto, item[1]);
 
       // Check if the calculations went well
-      if (pesos != null && dolar != null && bolivar != null && item.length == 4) {
-        expenseSheet.appendRow([date, item[0], item[1], bolivar, pesos, dolar, item[3]]);
-        message = "Gasto guardado exitosamente. Tipo de cambios: Bs/USD=" + bsUsd + " Bs/COP=" + bsPesos + " USD/COP=" + usdPesos;
-        this.sendMessage(message);
-        return {success: true, message};
+      if (pesos != null && dolares != null && bolivares != null && item.length == 4) {
+        expenseSheet.appendRow([date, item[0], item[1], bolivares, pesos, dolares, item[3]]);
+        const message = "Gasto guardado exitosamente!";
+        const expenseAdded = "\n\nCategoria " + item[0] + ":\n      Dolares: " + dolares + "\n      Pesos: " + pesos + "\n      Bolivares: " + bolivares;
+        const exchangeRates = "\nTasas de cambios:\n      BS/USD: " + bsUsd.toFixed(2) + "\n      COP/BS: " + pesoBs.toFixed(2) + "\n      COP/USD: " + pesoUsd.toFixed(2);
+        const budgetMessage = this.checkBudget(dolares, item[0]);
+        this.sendMessage(message + expenseAdded + exchangeRates + budgetMessage);
       } else {
         throw new Error("ERROR: Verifique el formato del mensaje.");
       }
+      
     } catch (error) {
-      console.log(error);
       this.sendMessage(error.message);
     }
+  }
+
+  /**
+   * Check and calculate the amount of money to be saved based on the exchange rates
+   * taken from the exchangeratesapi.io API
+   */
+  checkCurrencyValues(monto, currency) {
+    const currencyData = this.getCurrencyInfo();
+    const rates = currencyData['rates'];
+    const eurUsd = parseFloat(rates['USD']);
+    const eurVes = parseFloat(rates['VES']);
+    const bsUsd = parseFloat(rates['VES'])/eurUsd;
+    const pesoUsd = parseFloat(rates['COP'])/eurUsd;
+    const pesoBs = parseFloat(rates['COP'])/eurVes;
+    let pesos = null;
+    let dolares = null;
+    let bolivares = null;
+
+    // Calculate all the currences to keep a history record
+    if (currency == 'Bolivar') {
+      pesos = parseFloat(monto * pesoBs).toFixed(2);
+      dolares = parseFloat(monto / bsUsd).toFixed(2);
+      bolivares = monto;
+    } else if (currency == 'Dolar') {
+      pesos = parseFloat(monto * pesoUsd).toFixed(2);
+      dolares = monto;
+      bolivares = parseFloat(monto * bsUsd).toFixed(2);
+    } else if (currency == 'Peso') {
+      pesos = monto;
+      dolares = parseFloat(monto / pesoUsd).toFixed(2);
+      bolivares = parseFloat(monto / pesoBs).toFixed(2);
+    }
+    return {pesos, dolares, bolivares, bsUsd, pesoBs, pesoUsd};
   }
 
   /**
@@ -188,7 +235,7 @@ class BaseSource {
       // and start asking for next cell to be filled out
       if (this.text == '/reporte') {
         const statusReporte = this.otrosSheet.getRange('F3');
-        this.cleanReportCells(this.otrosSheet);
+        this.cleanReportCells();
         statusReporte.setValue('VERDADERO');
         message = "El reporte ah iniciado...";
         this.sendMessage(message);
@@ -210,10 +257,9 @@ class BaseSource {
         this.sendMessage(message);
 
         // and clean the cells for a next report
-        this.cleanReportCells(otrosSheet);
+        this.cleanReportCells();
       }
     } catch (error) {
-      console.log(error);
       this.sendMessage(error.message);
     }
   }
@@ -231,7 +277,7 @@ class BaseSource {
   cleanReport() {
     const statusReporte = this.otrosSheet.getRange('F3');
     if (statusReporte.getValue() == 'VERDADERO') {
-      this.cleanReportCells(this.otrosSheet);
+      this.cleanReportCells();
       this.sendMessage("El reporte ah finalizado brother!");
     }
   }
