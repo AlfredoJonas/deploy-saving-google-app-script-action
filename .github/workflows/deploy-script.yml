@@ -5,23 +5,8 @@ on:
     branches: [carmen-uzcategui, jonas-gonzalez, angelica-gonzalez, maldonado-perez, josue-nino]
   release:
     types: [published]
-  schedule:
-    - cron: "45 12 * * *"
 
 jobs:
-  scheduledCredentialsUpdate:
-    runs-on: ubuntu-latest
-    if: ${{github.event_name	== 'schedule'}}
-    name: Update scheduled deploy version to keep credentials uptodated
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          path: main
-      - uses: Embraser01/update-git-branch-action@v1.0.0
-        with:
-          branch: jonas-gonzalez
-          githubToken: ${{ secrets.REPO_ACCESS_TOKEN }}
-
   deploy:
     runs-on: ubuntu-latest
     if: ${{github.event_name	!= 'schedule' && success()}}
