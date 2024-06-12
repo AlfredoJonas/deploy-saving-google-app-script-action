@@ -19,7 +19,8 @@ This repository help us to setup an automatic [CI/CD](https://en.wikipedia.org/w
 
 1. Once in the AppScript, go to the config tap in the left sidebar
 2. Scroll down on the 'sequencer Command-Line Parameters' section and start adding the following parameters:
-    * exchangeUrl: 'https://s3.amazonaws.com/dolartoday/data.json'
+    * exchangeUrl: 'http://api.exchangeratesapi.io/v1'
+    * exchangeratesapiAccessKey: '{{exchange_rates_api}}' go to https://exchangeratesapi.io/ create an account and get the api access key
     * ssId: `SSID`
     * telegramToken: `telegramToken`
     * telegramUrl: 'https://api.telegram.org/bot'
